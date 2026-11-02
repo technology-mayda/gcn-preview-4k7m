@@ -1,0 +1,1582 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0D0D0D">
+<title>Acceleration Navigator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">
+<style>
+/* =========================================================
+   Acceleration Navigator — prototype v4 · design-polish pass
+   Generic "Ambition Accelerated" master brand (see _ref/brand/brand-spec-generic.md)
+   v3 flows/behaviour kept. Rules: no shadows, no glows, no radial gradients, no gold.
+   Monochrome UI. The Unity Gradient appears ONLY as:
+     1) questionnaire / thinking progress line  2) the lockup underline
+     3) one signature divider at the plan's "Ask us"  4) the map route arc
+   Type: Expanded Black caps = H1/H2 only. Everything else = GT America Standard, sentence case.
+   Scale (mobile) 44 / 32 / 22 / 17 / 14 / 12 · spacing on a 4/8pt grid.
+   ========================================================= */
+/* GT America (Grilli Type) — DESKTOP licence files, loaded locally for review.
+   Before publishing as a web link: confirm a Grilli Type WEB licence, or delete these
+   @font-face rules so the build falls back to Archivo (wdth 125) from Google Fonts. */
+:root{
+  /* ===== BRAND CONFIG — reskin here ===== */
+  --unity:linear-gradient(90deg,#FFBF00 6.73%,#F97316 16.35%,#F97316 24.04%,#E11D48 37.98%,#E11D48 43.75%,#4F46E5 56.73%,#4F46E5 61.54%,#0891B2 71.63%,#0891B2 83.17%,#00DF81 94.23%);
+  --bg:#0D0D0D;          /* master dark ground */
+  --black:#000000;
+  --raise:#141414;       /* image-slot fallback field */
+  --text:#FFFFFF;
+  --text2:#CCCCCC;       /* Gray 80 */
+  --muted:#999999;       /* Gray 60 */
+  --label:#888888;       /* labels, meta */
+  --dim:#666666;         /* Gray 40 — indices */
+  --rule:rgba(255,255,255,.14);   /* hairline */
+  --rule-2:rgba(255,255,255,.28);
+  --ph:#888888;          /* [bracket] placeholder outline */
+  --err:#FF5A4E;         /* functional form error only — not a brand colour */
+  --display:"GTA Expanded","Archivo","Helvetica Neue",Arial,sans-serif;
+  --body:"GTA Standard","Archivo","Helvetica Neue",Arial,system-ui,sans-serif;
+  /* stills are shown monochrome (brand §4.4: master imagery is greyscale; the gradient is the only colour) */
+  --still-filter:grayscale(1) contrast(1.05);
+  --r:2px;
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --out:cubic-bezier(.16,1,.3,1);
+  /* type scale */
+  --fs-1:44px; --fs-2:32px; --fs-3:22px; --fs-4:17px; --fs-5:14px; --fs-6:12px;
+  /* spacing (4/8) */
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px; --s8:64px; --s9:96px;
+  --g:24px;              /* side gutter = the one left edge */
+  --top:64px;
+}
+@media (min-width:1024px){:root{--fs-1:80px;--fs-2:52px;--fs-3:26px;--fs-4:19px;--fs-5:15px;--g:56px;--top:80px}}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;height:100dvh;background:var(--bg);color:var(--text)}
+body{font-family:var(--body);font-stretch:100%;font-size:var(--fs-4);line-height:1.5;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow:hidden;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;text-align:left}
+input,textarea{font:inherit;color:inherit}
+:focus{outline:none}
+:focus-visible{outline:2px solid #fff;outline-offset:3px;border-radius:var(--r)}
+::selection{background:#fff;color:#000}
+ol,ul{list-style:none}
+img{display:block}
+.defs{position:absolute;width:0;height:0;overflow:hidden;pointer-events:none}
+
+#app{position:fixed;inset:0;overflow:hidden}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;transition:opacity .45s var(--ease)}
+.screen.on{opacity:1}
+.screen.off{opacity:0;pointer-events:none}
+.rv{opacity:0;transform:translateY(14px);transition:opacity .8s var(--out),transform .8s var(--out);transition-delay:var(--d,0ms)}
+.rv.in{opacity:1;transform:none}
+
+/* ---------- type ---------- */
+.hx{font-family:var(--display);font-stretch:125%;font-weight:900;text-transform:uppercase;letter-spacing:-.02em;line-height:.92}
+.hx2{font-family:var(--display);font-stretch:125%;font-weight:400;text-transform:uppercase;letter-spacing:-.01em;line-height:.98}
+.eyebrow{display:block;font-size:13px;font-weight:500;letter-spacing:.005em;color:var(--label);line-height:1.4}
+.idx{font-variant-numeric:tabular-nums}
+
+/* ---------- controls ---------- */
+.ar{width:18px;height:18px;flex:none;transition:transform .3s var(--out)}
+.btn{display:inline-flex;align-items:center;justify-content:space-between;gap:24px;height:56px;padding:0 20px 0 24px;border-radius:var(--r);background:#fff;color:#000;font-size:16px;font-weight:500;letter-spacing:-.005em;white-space:nowrap;transition:background .2s,transform .15s var(--ease)}
+.btn:hover{background:#EDEDED}
+.btn:hover .ar{transform:translateX(3px)}
+.btn:active{transform:scale(.985);background:#D6D6D6}
+.btn.ghost{background:transparent;color:#fff;border:1px solid var(--rule-2)}
+.btn.ghost:hover{border-color:#fff;background:transparent}
+.btn.ghost:active{background:rgba(255,255,255,.06)}
+.lnk{display:inline;font-weight:500;color:#fff;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:5px;text-decoration-color:rgba(255,255,255,.45);transition:text-decoration-color .2s,opacity .15s}
+.lnk:hover{text-decoration-color:#fff}
+.lnk:active{opacity:.6}
+.tbtn{display:inline-flex;align-items:center;gap:10px;min-height:44px;font-size:15px;font-weight:500;color:#fff;transition:opacity .15s}
+.tbtn:active{opacity:.6}
+.tbtn .ic{width:28px;height:28px;border:1px solid var(--rule-2);border-radius:50%;display:grid;place-items:center;flex:none;transition:border-color .2s,background .2s}
+.tbtn .ic svg{width:12px;height:12px}
+.tbtn:hover .ic{border-color:#fff}
+
+/* placeholders + tags */
+.ph{color:#E5E5E5;border:1px dashed var(--ph);border-radius:var(--r);padding:0 4px;white-space:nowrap;font-weight:500}
+.sample,.chip{display:inline-flex;align-items:center;font-weight:500;color:var(--label);border:1px solid var(--rule-2);border-radius:var(--r);white-space:nowrap;letter-spacing:.005em}
+.sample{height:18px;padding:0 5px;font-size:11px;vertical-align:2px;line-height:1}
+.chip{height:26px;padding:0 9px;font-size:12px}
+
+/* Unity lines (progress only) */
+.utrack{height:2px;background:var(--rule);position:relative;overflow:hidden}
+.utrack i{position:absolute;inset:0;background:var(--unity);clip-path:inset(0 100% 0 0);transition:clip-path .8s var(--out)}
+
+/* ---------- header system: monogram + product (app) · full wordmark (start, done) ---------- */
+.top{flex:none;position:relative;z-index:20;display:flex;align-items:center;gap:16px;height:var(--top);padding:0 var(--g);border-bottom:1px solid var(--rule);background:var(--bg)}
+.brand{display:flex;align-items:center;gap:12px;min-height:44px;color:#fff}
+.brand .lk{display:block;flex:none}
+.brand .lk-m{height:24px;width:auto}
+.brand .prod{font-size:15px;font-weight:500;letter-spacing:-.01em;white-space:nowrap;line-height:1}
+.brand .lk-h{width:184px;height:auto}           /* cap A ≈ 7.4px → clear space ≥ 8px all sides */
+.top .grow{flex:1}
+.tlinks{display:flex;gap:20px;align-items:center}
+.tlink{white-space:nowrap;font-size:15px;font-weight:500;color:var(--text2);min-height:44px;transition:color .2s,opacity .15s}
+.tlink:hover{color:#fff}
+.tlink:active{opacity:.6}
+
+/* ---------- image slots: still on top of an intentional fallback ---------- */
+.slot{position:relative;overflow:hidden;background:var(--raise)}
+.slot .fb{position:absolute;inset:0}
+.slot .fb svg{position:absolute;inset:0;width:100%;height:100%}
+.slot .still{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:var(--still-filter);opacity:0;transform:scale(1.03);transition:opacity 1s var(--ease),transform 2.4s var(--out)}
+.slot .still.ok{opacity:1;transform:none}
+.slot .ai{position:absolute;z-index:3;top:12px;right:12px;font-size:11px;font-weight:500;color:#fff;background:rgba(0,0,0,.72);border-radius:var(--r);padding:3px 7px;opacity:0;transition:opacity .6s}
+.film .ai{display:none}
+.slot .still.ok ~ .ai{opacity:1}
+
+/* =========================================================
+   MAP — legible, typographic
+   ========================================================= */
+.gcmap{display:block}
+.gcmap .dot{fill:rgba(255,255,255,.13)}
+.gcmap .dot.f{fill:rgba(255,255,255,.6)}
+.gcmap .coast{fill:none;stroke:rgba(255,255,255,.55);stroke-width:1.2}
+.gcmap .island{stroke:rgba(255,255,255,.45);stroke-width:3}
+.gcmap .cline{stroke:rgba(255,255,255,.2);stroke-width:1;stroke-dasharray:2 4}
+.gcmap .clab{font-family:var(--body);font-size:17px;font-weight:500;fill:rgba(255,255,255,.5)}
+.gcmap .clab.f{fill:#fff}
+.gcmap .node circle.c{fill:var(--bg);stroke:rgba(255,255,255,.6);stroke-width:1.5}
+.gcmap .node text{font-family:var(--body);font-size:17px;font-weight:400;fill:rgba(255,255,255,.6)}
+.gcmap .node .halo{fill:var(--bg)}
+.gcmap .node.on circle.c{fill:#fff;stroke:#fff}
+.gcmap .node.on text{fill:#fff;font-weight:500}
+.gcmap .node.p .ring{fill:none;stroke:#fff;stroke-width:1.2}
+.gcmap .arc{fill:none;stroke:url(#aaUnityRoute);stroke-width:2.5;stroke-linecap:round}
+.gcmap .arcdot{fill:#fff}
+.gcmap .arclab{font-family:var(--body);font-size:16px;font-weight:500;fill:#fff}
+.gcmap .ocean{font-family:var(--body);font-size:15px;letter-spacing:.24em;fill:rgba(255,255,255,.3);font-weight:500}
+/* the hero fallback: the coast itself as the picture */
+.gcmap.hero .dot{fill:rgba(255,255,255,.16);r:1.4px}
+.gcmap.hero .coast{stroke:rgba(255,255,255,.7)}
+.gcmap.hero .node text{fill:rgba(255,255,255,.72);font-size:14px}
+.gcmap.hero .node circle.c{fill:#fff;stroke:#fff}
+.gcmap.hero .ocean{font-size:11px}
+.gcmap.poster .dot{fill:rgba(255,255,255,.05);r:1.3px}
+.gcmap.poster .dot.f{fill:rgba(255,255,255,.11)}
+.gcmap.poster .coast{stroke:rgba(255,255,255,.4)}
+
+/* =========================================================
+   1 · START
+   ========================================================= */
+.attract{cursor:pointer}
+.attract .top{border-bottom:0}
+.att{flex:1;min-height:0;display:flex;flex-direction:column}
+.hero-slot{flex:1;min-height:260px;background:var(--bg)}
+.hero-slot:after{content:"";position:absolute;z-index:2;left:0;right:0;bottom:0;height:62%;background:linear-gradient(to top,var(--bg) 10%,rgba(13,13,13,.92) 42%,rgba(13,13,13,0));pointer-events:none}
+.hero-slot .fb svg{opacity:.95}
+.place{position:absolute;z-index:3;left:var(--g);right:var(--g);bottom:var(--s5)}
+.place .pl{display:block;font-size:30px;color:#fff;margin-top:var(--s3)}
+.place .eyebrow{color:var(--text2)}
+.att-copy{flex:none;padding:var(--s2) var(--g) calc(var(--s5) + env(safe-area-inset-bottom))}
+.att h1{display:block}
+.att h1 .l1,.att h1 .l2{display:block}
+.att h1 .l1{font-size:var(--fs-2)}
+.att h1 .l2{font-size:var(--fs-3);color:var(--text2);margin-top:var(--s3);line-height:1.04}
+.att-cta{margin-top:var(--s6);display:flex;flex-direction:column;gap:var(--s3)}
+.att-cta .btn{width:100%}
+.att-cta .meta{font-size:13px;color:var(--label);display:flex;justify-content:space-between;gap:12px}
+
+/* =========================================================
+   2 · INTAKE
+   ========================================================= */
+.intake .scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.intake .wrap{max-width:880px;padding:var(--s5) var(--g) var(--s8)}
+.answered{display:flex;flex-direction:column}
+.answered li{display:grid;grid-template-columns:72px minmax(0,1fr);gap:2px 12px;padding:var(--s3) 0;border-bottom:1px solid var(--rule);animation:fadeUp .5s var(--out)}
+.answered .q{font-size:13px;font-weight:500;color:var(--label);padding-top:2px}
+.answered .a{font-size:16px;font-weight:500;color:#fff;line-height:1.4}
+.answered .k{grid-column:2;font-size:14px;color:var(--muted);line-height:1.45}
+.qcur{margin-top:var(--s6)}
+.qcur.enter{animation:qIn .6s var(--out) both}
+.qcur.leave{opacity:0;transform:translateY(-10px);transition:opacity .22s var(--ease),transform .22s var(--ease)}
+.qn{font-size:13px;font-weight:500;color:var(--label)}
+.qn b{color:#fff;font-weight:500}
+.qcur h2{font-size:var(--fs-2);margin:var(--s3) 0 var(--s3)}
+.qcur .sub{font-size:15px;color:var(--muted);max-width:34em}
+.opts{margin-top:var(--s5);border-top:1px solid var(--rule)}
+.opt{position:relative;display:grid;grid-template-columns:36px minmax(0,1fr) 20px;align-items:center;width:100%;min-height:60px;padding:12px 0;border-bottom:1px solid var(--rule);font-size:var(--fs-4);font-weight:400;color:var(--text2);line-height:1.35;transition:color .2s,background .2s,opacity .3s}
+.opt .n{font-size:12px;color:var(--dim);font-variant-numeric:tabular-nums;transition:color .2s}
+.opt .ar{opacity:0;transform:translateX(-6px);transition:opacity .25s,transform .3s var(--out)}
+.opt:hover{color:#fff}
+.opt:hover .ar{opacity:1;transform:none}
+.opt:active{background:rgba(255,255,255,.05)}
+.opt.sel{color:#fff;font-weight:500}
+.opt.sel .n{color:#fff}
+.opt.sel .ar{opacity:1;transform:translateX(3px)}
+.opt.sel:before{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:#fff;transform-origin:left;animation:lineIn .45s var(--out)}
+.opts.dim .opt:not(.sel){opacity:.28;pointer-events:none}
+.typed{margin-top:var(--s5);display:flex;align-items:flex-end;gap:var(--s4)}
+.typed label{display:block}
+.typed .f{flex:1;min-width:0}
+.typed input{display:block;width:100%;height:48px;background:transparent;border:0;border-bottom:1px solid var(--rule-2);border-radius:0;outline:0;font-size:var(--fs-4);color:#fff;padding:0;transition:border-color .2s}
+.typed input:focus{border-bottom-color:#fff}
+.typed input::placeholder{color:#5E5E5E;transition:opacity .3s}
+.typed input.swap::placeholder{opacity:0}
+.typed .go{flex:none;display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 2px;font-size:15px;font-weight:500;color:#fff;border-bottom:1px solid #fff;transition:opacity .2s}
+.typed .go .ar{width:16px;height:16px}
+.typed .go:disabled{opacity:.28;cursor:default}
+.typed .go:not(:disabled):active{opacity:.6}
+.closing{margin-top:var(--s6);font-size:16px;color:var(--muted);animation:fadeUp .5s var(--out)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes qIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes lineIn{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
+/* =========================================================
+   3 · THINKING — one sweeping line, one status
+   ========================================================= */
+.think .body{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;padding:0 var(--g) 16vh;max-width:980px}
+.think .goal{font-size:var(--fs-2);margin:var(--s3) 0 var(--s7);color:#fff;line-height:1.02}
+.sweep{position:relative;height:2px;background:var(--rule);overflow:hidden;max-width:560px}
+.sweep i{position:absolute;inset:0;background:var(--unity);animation:sweep 1.9s var(--ease) infinite}
+@keyframes sweep{0%{clip-path:inset(0 100% 0 0)}55%{clip-path:inset(0 0 0 0)}100%{clip-path:inset(0 0 0 100%)}}
+.think .status{margin-top:var(--s4);font-size:15px;color:var(--text2);min-height:1.5em;transition:opacity .25s,transform .25s var(--ease)}
+.think .status.out{opacity:0;transform:translateY(4px)}
+.think .skip{margin-top:var(--s6);align-self:flex-start;font-size:15px}
+
+/* =========================================================
+   4 · PLAN
+   ========================================================= */
+.plan .scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.plan .wrap{max-width:1360px;margin:0 auto;padding:var(--s5) var(--g) calc(120px + env(safe-area-inset-bottom))}
+.phero{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s6)}
+.erow{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.phero h1{font-size:40px;margin:var(--s4) 0 var(--s4)}
+.lead{font-size:var(--fs-4);line-height:1.5;color:var(--text2);max-width:30em}
+.spec{margin-top:var(--s5);border-top:1px solid var(--rule)}
+.spec > div{display:grid;grid-template-columns:88px minmax(0,1fr);gap:12px;padding:12px 0;border-bottom:1px solid var(--rule);align-items:baseline}
+.spec dt{font-size:13px;font-weight:500;color:var(--label)}
+.spec dd{font-size:15px;font-weight:500;color:#fff;overflow-wrap:anywhere;line-height:1.4}
+
+/* film poster */
+.film{display:block;width:100%;aspect-ratio:4/3;border-radius:var(--r);text-align:left;color:#fff;transition:transform .2s var(--ease)}
+.film:active{transform:scale(.995)}
+.film video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .6s;filter:var(--still-filter)}
+.film.ready video{opacity:.75}
+.film:after{content:"";position:absolute;z-index:1;left:0;right:0;bottom:0;height:70%;background:linear-gradient(to top,rgba(0,0,0,.9),rgba(0,0,0,.55) 45%,rgba(0,0,0,0));pointer-events:none}
+.film .ftop{position:absolute;z-index:2;left:16px;right:16px;top:14px;display:flex;justify-content:flex-start;align-items:center;gap:8px}
+.film .ftop .eyebrow{color:var(--text2)}
+.film .flab{font-size:11px;font-weight:500;color:#fff;background:rgba(0,0,0,.72);border:1px solid rgba(255,255,255,.35);border-radius:var(--r);padding:3px 6px;white-space:nowrap}
+.film .fbot{position:absolute;z-index:2;left:16px;right:16px;bottom:16px;display:flex;align-items:flex-end;gap:14px}
+.film .play{width:52px;height:52px;border-radius:50%;background:#fff;color:#000;display:grid;place-items:center;flex:none;transition:transform .3s var(--out)}
+.film .play svg{width:18px;height:18px;margin-left:3px}
+.film:hover .play{transform:scale(1.06)}
+.film .ftxt{flex:1;min-width:0}
+.film .ftt{display:block;font-size:28px}
+.film .fst{display:block;font-size:15px;font-weight:500;margin-top:6px;color:#fff}
+.film .dur{font-weight:400;color:var(--text2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.film .dur:before{content:"  ·  ";white-space:pre}
+.film.missing .dur{color:var(--text2)}
+
+/* where we'd start */
+.where{margin-top:var(--s7);border-top:1px solid var(--rule-2);padding-top:var(--s4)}
+.where .wh{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.counties{margin-top:var(--s3)}
+.counties li{display:grid;grid-template-columns:20px minmax(0,1fr) auto;gap:0 8px;align-items:baseline;padding:14px 0;border-bottom:1px solid var(--rule);color:var(--muted)}
+.counties .mk{width:9px;height:9px;border:1px solid var(--rule-2);transform:translateY(-1px)}
+.counties .cn{font-size:var(--fs-4);font-weight:500;color:var(--text2)}
+.counties .ct{grid-column:2/-1;font-size:14px;color:var(--label);margin-top:2px}
+.counties .rec{font-size:12px;font-weight:500;color:#000;background:#fff;border-radius:var(--r);padding:3px 7px;white-space:nowrap}
+.counties li.on .mk{background:#fff;border-color:#fff}
+.counties li.on .cn{color:#fff}
+.counties li.on .ct{color:var(--text2)}
+.mapwrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .6s var(--out)}
+.mapwrap > div{min-height:0;overflow:hidden}
+.mapwrap.open{grid-template-rows:1fr}
+.mapwrap svg{width:100%;height:auto;margin:var(--s4) 0 var(--s2)}
+.mapbtn{margin-top:var(--s2)}
+.mapbtn .ic svg{transition:transform .4s var(--out)}
+.mapbtn[aria-expanded="true"] .ic svg{transform:rotate(45deg)}
+
+/* sections */
+.sec{margin-top:var(--s8);border-top:1px solid var(--rule-2);padding-top:var(--s4);display:grid;grid-template-columns:minmax(0,1fr)}
+.sec-h .idx{display:block;font-size:13px;font-weight:500;color:var(--label)}
+.sec-h h2{font-size:var(--fs-2);margin-top:var(--s4)}
+.sec-h p{margin-top:var(--s3);font-size:15px;color:var(--muted);max-width:32em}
+.sec-b{margin-top:var(--s5)}
+
+/* advantages */
+.rows > li{border-top:1px solid var(--rule);padding:var(--s5) 0}
+.rows > li:first-child{border-top:0;padding-top:var(--s2)}
+.rows .rh{display:flex;flex-direction:column-reverse;align-items:flex-start;gap:10px}
+.rows h3{font-size:20px;font-weight:500;line-height:1.25;letter-spacing:-.01em}
+.match{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:500;color:var(--label);white-space:nowrap}
+.match:before{content:"";width:7px;height:7px;border:1px solid currentColor}
+.match.s3{color:#fff}
+.match.s3:before{background:#fff}
+.rows p{font-size:15px;color:var(--text2);line-height:1.55;margin-top:var(--s2)}
+.rows .proof{font-size:14px;color:var(--muted);margin-top:var(--s2)}
+
+/* directory rows — name first, meta second, expand for detail */
+.dir{border-top:1px solid var(--rule)}
+.dir > li{border-bottom:1px solid var(--rule)}
+.dbtn{display:grid;grid-template-columns:minmax(0,1fr) 28px;gap:4px 16px;align-items:center;width:100%;min-height:80px;padding:14px 0;transition:background .2s}
+.dbtn:active{background:rgba(255,255,255,.04)}
+.dbtn .dt{font-size:var(--fs-4);font-weight:500;color:#fff;line-height:1.3}
+.dbtn .dm{grid-column:1;font-size:14px;color:var(--label);line-height:1.4}
+.dbtn .dm b{font-weight:500;color:var(--text2)}
+.dbtn .ic{grid-column:2;grid-row:1/3;width:28px;height:28px;border:1px solid var(--rule);border-radius:50%;display:grid;place-items:center;color:var(--text2);transition:border-color .2s,color .2s}
+.dbtn .ic svg{width:12px;height:12px;transition:transform .4s var(--out)}
+.dbtn:hover .ic{border-color:#fff;color:#fff}
+.dbtn[aria-expanded="true"] .ic svg{transform:rotate(45deg)}
+.dd{display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s var(--out)}
+.dd > div{min-height:0;overflow:hidden}
+.dd p{font-size:15px;color:var(--text2);line-height:1.55;padding:0 44px var(--s4) 0}
+li.open .dd{grid-template-rows:1fr}
+
+/* people */
+.people > li{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:16px;padding:var(--s5) 0;border-bottom:1px solid var(--rule)}
+.people{border-top:1px solid var(--rule)}
+.people .nm{font-size:var(--fs-4);font-weight:500;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.people .rl{font-size:14px;color:var(--text2);margin-top:4px}
+.people .org{font-size:14px;color:var(--label)}
+.people .why{grid-column:1/-1;font-size:14px;color:var(--muted);line-height:1.55;margin-top:var(--s2)}
+.toggle{grid-row:1;grid-column:2;align-self:start;display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 12px 0 10px;border:1px solid var(--rule-2);border-radius:var(--r);font-size:13px;font-weight:500;color:var(--text2);white-space:nowrap;transition:background .2s,color .2s,border-color .2s,transform .15s}
+.toggle:active{transform:scale(.97)}
+.toggle .box{width:14px;height:14px;display:grid;place-items:center}
+.toggle .box svg{width:14px;height:14px}
+.toggle[aria-pressed="true"]{border-color:#fff;color:#fff}
+.toggle:hover{border-color:#fff}
+
+/* 90 days */
+.phases{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s6)}
+.phase .bar{height:2px;background:var(--rule);position:relative;overflow:hidden;margin-bottom:var(--s4)}
+.phase .bar i{position:absolute;inset:0;background:#fff;clip-path:inset(0 100% 0 0);transition:clip-path 1.1s var(--out);transition-delay:var(--d,0ms)}
+.phase .bar.in i{clip-path:inset(0 0 0 0)}
+.phase h4{font-size:var(--fs-3);font-weight:500;letter-spacing:-.01em;margin:6px 0 var(--s3)}
+.phase ul li{font-size:15px;color:var(--text2);line-height:1.45;padding:11px 0;border-top:1px solid var(--rule)}
+
+/* success story */
+.story h3{font-size:var(--fs-3);font-weight:500;line-height:1.25;letter-spacing:-.01em;margin-top:var(--s3)}
+.story .co{font-size:14px;color:var(--label);margin-top:var(--s2)}
+.story .d{font-size:15px;color:var(--text2);line-height:1.55;margin-top:var(--s3);max-width:34em}
+.stats{display:grid;grid-template-columns:1fr 1fr;margin-top:var(--s5);border-top:1px solid var(--rule)}
+.stats > div{padding:var(--s4) 12px 0 0}
+.stats > div + div{border-left:1px solid var(--rule);padding-left:var(--s4)}
+.stats b{display:block;font-size:20px;font-weight:500}
+.stats > div > span{display:block;font-size:13px;color:var(--label);margin-top:4px}
+.story .act{margin-top:var(--s5)}
+
+/* the one signature divider */
+.sig{margin-top:var(--s8);height:3px;position:relative}
+.sig i{position:absolute;inset:0;background:var(--unity);clip-path:inset(0 100% 0 0);transition:clip-path 1.6s var(--out)}
+.sig.in i{clip-path:inset(0 0 0 0)}
+.sec.ask{margin-top:0;border-top:0;padding-top:var(--s5)}
+.qs .opt{font-size:16px}
+.thread2 .qa{padding:var(--s4) 0;border-bottom:1px solid var(--rule);animation:fadeUp .5s var(--out)}
+.thread2 .qa .q{font-size:13px;font-weight:500;color:var(--label)}
+.thread2 .qa p{font-size:16px;line-height:1.6;color:#fff;margin-top:6px;max-width:40em}
+.planfoot{margin-top:var(--s8);padding-top:var(--s4);border-top:1px solid var(--rule);display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 24px;font-size:12px;color:var(--dim)}
+
+/* CTA bar — slim, collapses to the button while scrolling */
+.ctabar{position:absolute;left:0;right:0;bottom:0;z-index:30;padding:10px var(--g) calc(10px + env(safe-area-inset-bottom));background:var(--black);border-top:1px solid var(--rule);transform:translateY(110%);transition:transform .6s var(--out),background .35s,border-color .35s}
+.ctabar.in{transform:none}
+.ctabar .in2{max-width:1360px;margin:0 auto;display:flex;align-items:center;gap:16px}
+.ctabar .q{flex:1;min-width:0;transition:opacity .3s,transform .35s var(--out)}
+.ctabar .q .dq{display:none;font-size:16px;font-weight:500;line-height:1.3}
+.ctabar .cl{display:block;font-size:12px;color:var(--label);line-height:1.35}
+.ctabar .cnt{display:block;font-size:14px;font-weight:500;color:#fff;margin-bottom:2px}
+.ctabar .rest{display:block}
+.ctabar .rest:first-letter{text-transform:uppercase}
+.ctabar .btn{height:48px;padding:0 16px 0 18px;gap:12px;font-size:15px}
+.ctabar.mini{background:transparent;border-top-color:transparent;pointer-events:none}
+.ctabar.mini .q{opacity:0;transform:translateY(6px)}
+.ctabar.mini .btn{pointer-events:auto}
+
+/* =========================================================
+   5 · HANDOFF SHEET + CONFIRMATION
+   ========================================================= */
+.sheet{position:fixed;inset:0;z-index:60;display:flex;align-items:flex-end;justify-content:center;pointer-events:none}
+.sheet .scrim{position:absolute;inset:0;background:rgba(0,0,0,.8);opacity:0;transition:opacity .4s}
+.sheet .panel{position:relative;width:100%;max-height:calc(100% - env(safe-area-inset-top) - 12px);overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--bg);border-top:1px solid var(--rule-2);transform:translateY(100%);transition:transform .6s var(--out)}
+.sheet.on{pointer-events:auto}
+.sheet.on .scrim{opacity:1}
+.sheet.on .panel{transform:none}
+.sheet .x{position:absolute;top:10px;right:calc(var(--g) - 10px);z-index:2;width:44px;height:44px;display:grid;place-items:center;color:#fff;border-radius:50%;transition:background .2s}
+.sheet .x svg{width:18px;height:18px}
+.sheet .x:hover{background:rgba(255,255,255,.08)}
+.ho{display:grid;grid-template-columns:minmax(0,1fr)}
+.ho .l,.ho .r{padding:var(--s6) var(--g)}
+.ho .r{padding-bottom:calc(var(--s6) + env(safe-area-inset-bottom));border-top:1px solid var(--rule)}
+.ho h2{font-size:var(--fs-2);margin:var(--s3) 0 var(--s4);padding-right:48px}
+.ho .l > p{color:var(--text2);font-size:16px;max-width:30em}
+.intros{margin-top:var(--s5);border-top:1px solid var(--rule)}
+.intros li{display:grid;gap:2px;padding:12px 0;border-bottom:1px solid var(--rule)}
+.intros b{font-size:16px;font-weight:500;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.intros span.r2{font-size:14px;color:var(--label)}
+.plus{margin-top:var(--s4);font-size:14px;color:var(--muted);line-height:1.55}
+form .grid{display:grid;grid-template-columns:minmax(0,1fr);gap:4px 24px}
+.fld{display:flex;flex-direction:column}
+.fld.full{grid-column:1/-1}
+.fld label{font-size:13px;font-weight:500;color:var(--label);margin-top:var(--s4)}
+.fld label i{font-style:normal;color:var(--dim)}
+.fld input{height:46px;background:transparent;border:0;border-bottom:1px solid var(--rule-2);border-radius:0;outline:0;font-size:var(--fs-4);color:#fff;padding:0;transition:border-color .2s}
+.fld input:focus{border-bottom-color:#fff}
+.fld input::placeholder{color:#5A5A5A}
+.fld input.err{border-bottom-color:var(--err)}
+.fld .em{font-size:13px;color:var(--err);margin-top:6px}
+.fld .em:empty{display:none}
+.how{margin-top:var(--s6)}
+.how .opts{margin-top:var(--s2)}
+.how .opt{font-size:16px;min-height:52px}
+.consent{margin-top:var(--s5);font-size:13px;color:var(--label);line-height:1.55}
+.submit{margin-top:var(--s5);width:100%}
+
+.done{padding:var(--s7) var(--g) calc(var(--s6) + env(safe-area-inset-bottom));max-width:1180px}
+.done .dl{display:inline-block;padding:8px 0}                 /* clear space ≥ cap A */
+.done .dl svg{display:block;width:200px;height:auto;color:#fff}
+.done .dl rect{transform-box:fill-box;transform-origin:left center;transform:scaleX(0);animation:barIn 1.1s var(--out) .25s forwards}
+@keyframes barIn{to{transform:scaleX(1)}}
+.done h2{font-size:var(--fs-1);margin:var(--s7) 0 var(--s3);padding-right:40px}
+.done .sub2{font-size:var(--fs-3);color:var(--text2);max-width:24em;line-height:1.08}
+.done .p{margin-top:var(--s5);color:var(--text2);font-size:16px;max-width:34em}
+.done .p b{color:#fff;font-weight:500}
+.done .rv2{opacity:0;animation:fadeUp .7s var(--out) forwards;animation-delay:var(--d,0ms)}
+.next{margin-top:var(--s6);position:relative}
+.next li{position:relative;display:grid;grid-template-columns:32px minmax(0,1fr);gap:2px 12px;padding:0 0 var(--s5)}
+.next li:before{content:"";position:absolute;left:11px;top:24px;bottom:0;width:1px;background:var(--rule-2)}
+.next li:last-child:before{display:none}
+.next .dot{grid-row:1/4;width:23px;height:23px;border:1px solid var(--rule-2);border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:500;color:var(--label);background:var(--bg);position:relative}
+.next li.now .dot{background:#fff;border-color:#fff;color:#000}
+.next li.now .dot svg{width:13px;height:13px}
+.next .eyebrow{padding-top:2px}
+.next b{font-size:var(--fs-4);font-weight:500}
+.next .s{font-size:14px;color:var(--muted);line-height:1.5}
+.ref{margin-top:var(--s2);font-size:13px;color:var(--label);font-variant-numeric:tabular-nums;display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.ref b{color:#fff;font-weight:500;letter-spacing:.04em}
+.done .acts{display:flex;flex-direction:column;gap:var(--s4);margin-top:var(--s6);align-items:stretch}
+.done .acts .lnk{align-self:center;padding:8px 0}
+
+/* toast */
+.toast{position:fixed;left:var(--g);right:var(--g);top:calc(var(--top) + 12px);z-index:100;opacity:0;transform:translateY(-8px);pointer-events:none;background:#fff;color:#000;border-radius:var(--r);padding:14px 18px;font-size:14px;font-weight:500;transition:opacity .3s,transform .4s var(--out)}
+.toast.on{opacity:1;transform:none}
+
+/* =========================================================
+   6 · FILM PLAYER
+   ========================================================= */
+body.noscroll{overflow:hidden}
+.player{position:fixed;inset:0;z-index:90;background:#000;display:flex;flex-direction:column;opacity:0;pointer-events:none;visibility:hidden;transition:opacity .35s var(--ease),visibility 0s .35s}
+.player.on{opacity:1;pointer-events:auto;visibility:visible;transition:opacity .35s var(--ease)}
+.player .pbar{flex:none;display:flex;align-items:center;gap:14px;min-height:var(--top);padding:env(safe-area-inset-top) var(--g) 0;border-bottom:1px solid var(--rule)}
+.player .pbar .t{flex:1;min-width:0}
+.player .pbar b{display:block;font-size:15px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.player .pbar b i{font-style:normal;color:var(--text2);font-weight:400}
+.player .pbar span{display:block;font-size:12px;color:var(--label);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.player .px{flex:none;width:44px;height:44px;display:grid;place-items:center;border-radius:50%;margin-right:-10px}
+.player .px svg{width:18px;height:18px}
+.player .px:hover{background:rgba(255,255,255,.08)}
+.player .pstage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;position:relative}
+.player video{display:block;width:100%;height:100%;object-fit:contain;background:#000}
+.player .pfoot{flex:none;display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;padding:12px var(--g) calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--rule)}
+.ailabel{display:inline-flex;align-items:center;height:26px;padding:0 8px;border:1px solid var(--rule-2);border-radius:var(--r);font-size:12px;font-weight:500;color:rgba(255,255,255,.8);white-space:nowrap}
+.ailabel.g{color:#fff;border-color:#fff}
+.player .pnote{font-size:12px;color:var(--label);flex-basis:100%}
+.inprod{position:absolute;inset:0;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:24px var(--g);overflow-y:auto;max-width:900px}
+.inprod[hidden]{display:none}
+.inprod .w{font-size:clamp(48px,14vw,120px)}
+.inprod .s{margin-top:var(--s4);font-size:var(--fs-3);font-weight:500;color:#fff}
+.inprod .state{margin-top:var(--s5);font-size:12px;font-weight:500;color:var(--text2);border:1px dashed var(--ph);border-radius:var(--r);padding:5px 8px}
+.inprod p{margin-top:var(--s4);max-width:30em;font-size:16px;line-height:1.55;color:var(--text2)}
+.inprod .lnk{margin-top:var(--s5);font-size:16px}
+.inprod small{margin-top:var(--s5);font-size:12px;color:var(--dim);font-variant-numeric:tabular-nums;word-break:break-all}
+.player.missing video,.player.missing .pnote{display:none}
+
+/* =========================================================
+   PHONE → TABLET → DESKTOP
+   ========================================================= */
+@media (max-width:359px){ .brand .prod{display:none} }
+@media (max-width:767px){
+  .chip .pl2{display:none}
+  .tlinks{gap:16px}
+  .tlink{font-size:14px}
+  .brand .prod{font-size:14px}
+  .top{gap:12px}
+}
+@media (max-width:1023px){
+  .plan .top .brand .prod{max-width:none}
+}
+@media (min-width:768px) and (max-width:1023px){
+  body{background:#000}
+  #app{left:0;right:0;width:600px;margin:0 auto;border-left:1px solid var(--rule);border-right:1px solid var(--rule);background:var(--bg)}
+}
+@media (min-width:1024px){
+  .brand .lk-m{height:28px}
+  .brand .prod{font-size:16px}
+  .brand .lk-h{width:232px}
+  .tlinks{gap:32px}
+
+  /* start: copy left, image bleeds right */
+  .att{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.08fr)}
+  .hero-slot{grid-column:2;grid-row:1;min-height:0}
+  .hero-slot:after{height:46%}
+  .place{left:40px;right:40px;bottom:40px}
+  .place .pl{font-size:44px}
+  .att-copy{grid-column:1;grid-row:1;align-self:center;padding:0 64px 32px var(--g)}
+  .att h1 .l1{font-size:clamp(48px,min(4.6vw,7.4vh),76px)}
+  .att h1 .l2{font-size:clamp(26px,min(2.4vw,4vh),40px);margin-top:var(--s5)}
+  .att-cta{margin-top:var(--s7);flex-direction:row;align-items:center;gap:var(--s5)}
+  .att-cta .btn{width:auto;min-width:260px;height:64px;font-size:17px}
+  .att-cta .meta{flex-direction:column;gap:2px}
+
+  .intake .wrap{padding:var(--s7) var(--g) var(--s8)}
+  .answered li{grid-template-columns:120px minmax(0,1fr);padding:14px 0}
+  .qcur{margin-top:var(--s7)}
+  .qcur .sub{font-size:17px}
+  .opt{font-size:20px;min-height:68px;grid-template-columns:56px minmax(0,1fr) 24px}
+  .typed{max-width:720px;margin-top:var(--s6)}
+
+  .think .goal{font-size:clamp(40px,4.2vw,60px)}
+
+  .plan .wrap{padding-top:var(--s7)}
+  .phero{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:64px;align-items:start}
+  .phero h1{font-size:clamp(52px,4.8vw,76px);margin:var(--s5) 0 var(--s5)}
+  .lead{font-size:20px}
+  .spec{margin-top:var(--s6);display:grid;grid-template-columns:1fr 1fr;column-gap:32px}
+  .spec > div{grid-template-columns:96px minmax(0,1fr)}
+  .film{aspect-ratio:4/3}
+  .film .ftop{left:24px;right:24px;top:20px}
+  .film .fbot{left:24px;right:24px;bottom:24px;gap:18px}
+  .film .play{width:64px;height:64px}
+  .film .ftt{font-size:44px}
+  .film .fst{font-size:17px}
+
+  .where{margin-top:var(--s9);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 64px;padding-top:var(--s5)}
+  .where .wh{grid-column:1}
+  .counties{grid-column:1;margin-top:var(--s4);align-self:start}
+  .counties li{padding:20px 0}
+  .counties .cn{font-size:20px}
+  .mapwrap{grid-column:2;grid-row:1/4;grid-template-rows:1fr}
+  .mapwrap svg{height:600px;width:100%;margin:0}
+  .mapbtn{display:none}
+
+  .sec{grid-template-columns:minmax(0,1fr) minmax(0,1.65fr);gap:64px;margin-top:var(--s9);padding-top:var(--s5)}
+  .sec-h{position:sticky;top:var(--s5);align-self:start}
+  .sec-h h2{font-size:clamp(36px,3.1vw,48px)}
+  .sec-h p{font-size:16px}
+  .sec-b{margin-top:0}
+  .rows > li{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:8px 40px;padding:var(--s5) 0}
+  .rows > li:first-child{padding-top:0}
+  .rows .rh{flex-direction:column;gap:10px}
+  .rows h3{font-size:22px}
+  .rows p{margin-top:0}
+  .dbtn{min-height:88px}
+  .dbtn .dt{font-size:20px}
+  .people > li{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) auto;column-gap:32px}
+  .people .who{grid-column:1}
+  .people .why{grid-column:2;grid-row:1;margin-top:0}
+  .people .toggle{grid-column:3;grid-row:1}
+  .phases{grid-template-columns:repeat(3,minmax(0,1fr));gap:0}
+  .phase{padding-right:24px}
+  .phase:not(:last-child) .bar{margin-right:-24px}
+  .stats b{font-size:24px}
+  .sig{margin-top:var(--s9)}
+  .sec.ask{margin-top:0}
+
+  .ctabar{padding:14px var(--g)}
+  .ctabar .q .dq{display:block}
+  .ctabar .cl{font-size:13px;margin-top:2px}
+  .ctabar .cnt,.ctabar .rest{display:inline;font-size:13px;font-weight:400;color:var(--label)}
+  .ctabar .rest:before{content:" · "}
+  .ctabar .btn{height:52px;padding:0 20px 0 24px;font-size:16px}
+
+  .sheet .panel{width:min(1180px,calc(100% - 96px));border:1px solid var(--rule-2);border-bottom:0}
+  .ho{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)}
+  .ho .l,.ho .r{padding:var(--s8) var(--s7)}
+  .ho .r{border-top:0;border-left:1px solid var(--rule)}
+  form .grid{grid-template-columns:1fr 1fr}
+  .sheet .x{right:24px;top:20px}
+  .done{padding:var(--s8) var(--s8) var(--s7)}
+  .done .dl svg{width:280px}
+  .done h2{font-size:clamp(56px,5.6vw,88px)}
+  .next{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 32px}
+  .next li{grid-template-columns:minmax(0,1fr);padding:0}
+  .next li:before{left:32px;right:-32px;top:11px;bottom:auto;width:auto;height:1px}
+  .next .dot{grid-row:auto;margin-bottom:var(--s3)}
+  .done .acts{flex-direction:row;align-items:center;gap:var(--s6)}
+  .ref{margin-top:var(--s6)}
+  .done .acts .lnk{align-self:auto}
+
+  .player .pstage{padding:0 48px}
+  .player video{max-width:1400px}
+  .player .pnote{flex-basis:auto;margin-left:auto}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*:before,*:after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  .rv{opacity:1;transform:none}
+  .sweep i{clip-path:none}
+}
+
+</style>
+</head>
+<body>
+<svg class="defs" width="0" height="0" aria-hidden="true" focusable="false"><defs>
+  <linearGradient id="aaUnity" x1="0" y1="0" x2="1" y2="0"><stop offset=".0673" stop-color="#FFBF00"/><stop offset=".1635" stop-color="#F97316"/><stop offset=".2404" stop-color="#F97316"/><stop offset=".3798" stop-color="#E11D48"/><stop offset=".4375" stop-color="#E11D48"/><stop offset=".5673" stop-color="#4F46E5"/><stop offset=".6154" stop-color="#4F46E5"/><stop offset=".7163" stop-color="#0891B2"/><stop offset=".8317" stop-color="#0891B2"/><stop offset=".9423" stop-color="#00DF81"/></linearGradient>
+  <linearGradient id="aaUnityRoute" x1="0" y1="0" x2="0" y2="1"><stop offset=".0673" stop-color="#FFBF00"/><stop offset=".1635" stop-color="#F97316"/><stop offset=".2404" stop-color="#F97316"/><stop offset=".3798" stop-color="#E11D48"/><stop offset=".4375" stop-color="#E11D48"/><stop offset=".5673" stop-color="#4F46E5"/><stop offset=".6154" stop-color="#4F46E5"/><stop offset=".7163" stop-color="#0891B2"/><stop offset=".8317" stop-color="#0891B2"/><stop offset=".9423" stop-color="#00DF81"/></linearGradient>
+</defs></svg>
+<div id="app" aria-live="polite"></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(() => {
+"use strict";
+/* ===== BRAND CONFIG ===== */
+const CSSV = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const BRAND = {
+  logoLabel: "Ambition Accelerated",          /* aria label for the inline AA logo (no tagline attached) */
+  product: "Acceleration Navigator",
+  place: "Florida's Gold Coast",              /* the place we sell — set as copy, never as part of the logo */
+  series: "A Florida's Gold Coast series",
+  bg: CSSV("--bg") || "#0D0D0D",
+};
+/* Official AA lockups (exported vector masters, _ref/brand/logo). Bars share the #aaUnity gradient. */
+const LOGO = {
+  h: `<svg class="lk lk-h" aria-hidden="true" focusable="false" viewBox="16.39 18.29 540.55 43.42" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M36.9818 19.0369L47.1019 40.8103H38.7018L37.0219 36.6769H26.8085L25.1285 40.8103H16.7285L26.8485 19.0369H36.9952H36.9818ZM28.7152 31.9436H35.1285L33.5952 28.1703C33.2218 27.2503 32.3685 24.8903 31.9685 23.4769H31.8752C31.5018 24.8903 30.6219 27.2503 30.2485 28.1703L28.7152 31.9436Z" fill="currentColor"/><path d="M50.4219 40.7969V19.0236H62.0485L65.9418 30.0903C66.3152 31.1303 66.6485 31.997 66.7419 32.8236H66.8085C66.9019 31.997 67.2352 31.1036 67.6085 30.0369L71.3552 19.0236H83.2885V40.7969H76.1152V28.8369C76.1152 27.4636 76.2619 25.837 76.5419 24.237H76.3952C76.2085 25.0103 75.5019 27.0903 74.9285 28.5569L70.2085 40.7836H62.9152L58.4752 28.6103C57.8619 26.9303 57.3685 25.2636 57.1019 24.2236H56.9819C57.2619 25.6636 57.2885 27.3569 57.2885 28.8236V40.7836H50.4885L50.4219 40.7969Z" fill="currentColor"/><path d="M114.849 34.4903C114.849 37.5569 112.702 40.8103 106.382 40.8103H88.6618V19.0369H106.262C111.715 19.0369 114.329 21.1836 114.329 24.4636C114.329 26.6769 112.915 28.5969 109.795 29.2503C113.142 29.7436 114.849 31.5836 114.849 34.4903ZM96.5152 23.877V27.5303H103.875C105.689 27.5303 106.142 26.5169 106.142 25.5969C106.142 24.6769 105.649 23.877 103.875 23.877H96.5152ZM104.182 35.9569C105.929 35.9569 106.662 34.9169 106.662 33.8369C106.662 32.7036 105.809 31.877 104.182 31.877H96.5152V35.9569H104.182Z" fill="currentColor"/><path d="M118.742 40.7969V19.0236H126.595V40.7969H118.742Z" fill="currentColor"/><path d="M154.502 19.0369V25.0103H146.129V40.7969H138.275V25.0103H129.902V19.0369H154.502Z" fill="currentColor"/><path d="M157.822 40.7969V19.0236H165.675V40.7969H157.822Z" fill="currentColor"/><path d="M169.129 29.9169C169.129 22.8103 174.862 18.2903 183.902 18.2903C192.942 18.2903 198.649 22.7969 198.649 29.9169C198.649 37.0369 192.982 41.5303 183.902 41.5303C174.822 41.5303 169.129 37.0236 169.129 29.9169ZM190.382 29.9169C190.382 26.3303 187.835 23.9703 183.915 23.9703C179.995 23.9703 177.409 26.3303 177.409 29.9169C177.409 33.5036 179.982 35.8636 183.915 35.8636C187.849 35.8636 190.382 33.4769 190.382 29.9169Z" fill="currentColor"/><path d="M202.155 40.7969V19.0236H210.275L219.195 29.1703C219.782 29.8503 220.542 30.9169 221.035 31.8636H221.195V19.0103H228.275V40.7836H220.609L211.289 30.637C210.675 29.957 209.729 28.6503 209.422 27.877H209.262V40.7836H202.155V40.7969Z" fill="currentColor"/><path d="M264.649 19.0369L274.769 40.8103H266.369L264.689 36.6769H254.475L252.795 40.8103H244.395L254.515 19.0369H264.662H264.649ZM256.382 31.9436H262.795L261.262 28.1703C260.889 27.2503 260.035 24.8903 259.635 23.4769H259.542C259.169 24.8903 258.289 27.2503 257.915 28.1703L256.382 31.9436Z" fill="currentColor"/><path d="M274.929 30.0369C274.929 23.1703 280.995 18.2903 289.609 18.2903C296.782 18.2903 302.182 21.4236 303.649 26.4503L295.529 27.9836C294.889 25.4636 292.835 24.117 289.609 24.117C285.622 24.117 283.195 26.3569 283.195 29.9169C283.195 33.4769 285.582 35.6769 289.609 35.6769C292.862 35.6769 294.942 34.3303 295.555 31.8503L303.582 33.6236C301.835 38.6236 296.595 41.5303 289.355 41.5303C280.555 41.5303 274.915 37.0503 274.915 30.0369H274.929Z" fill="currentColor"/><path d="M305.902 30.0369C305.902 23.1703 311.969 18.2903 320.582 18.2903C327.755 18.2903 333.155 21.4236 334.622 26.4503L326.502 27.9836C325.862 25.4636 323.809 24.117 320.582 24.117C316.595 24.117 314.169 26.3569 314.169 29.9169C314.169 33.4769 316.555 35.6769 320.582 35.6769C323.835 35.6769 325.915 34.3303 326.529 31.8503L334.555 33.6236C332.809 38.6236 327.569 41.5303 320.329 41.5303C311.529 41.5303 305.889 37.0503 305.889 30.0369H305.902Z" fill="currentColor"/><path d="M360.449 27.3969V32.237H346.075V35.517H361.195V40.7969H338.235V19.0236H360.982V24.3036H346.075V27.3969H360.449Z" fill="currentColor"/><path d="M365.862 40.7969V19.0236H373.715V34.7836H387.449V40.7969H365.862Z" fill="currentColor"/><path d="M413.449 27.3969V32.237H399.075V35.517H414.195V40.7969H391.235V19.0236H413.982V24.3036H399.075V27.3969H413.449Z" fill="currentColor"/><path d="M435.862 40.7969L431.262 33.6903H426.689V40.7969H418.835V19.0236H434.075C441.582 19.0236 443.769 22.6369 443.769 26.1703C443.769 28.6236 442.635 31.4103 439.235 32.757L444.515 40.7836H435.875L435.862 40.7969ZM426.702 24.0369V29.0103H432.222C434.742 29.0103 435.502 27.8503 435.502 26.4636C435.502 25.0769 434.702 24.0369 432.249 24.0369H426.702Z" fill="currentColor"/><path d="M466.902 19.0369L477.022 40.8103H468.622L466.942 36.6769H456.729L455.049 40.8103H446.649L456.769 19.0369H466.915H466.902ZM458.622 31.9436H465.035L463.502 28.1703C463.129 27.2503 462.275 24.8903 461.875 23.4769H461.782C461.409 24.8903 460.529 27.2503 460.155 28.1703L458.622 31.9436Z" fill="currentColor"/><path d="M498.635 19.0369V25.0103H490.262V40.7969H482.409V25.0103H474.035V19.0369H498.635Z" fill="currentColor"/><path d="M524.182 27.3969V32.237H509.809V35.517H524.929V40.7969H501.969V19.0236H524.715V24.3036H509.809V27.3969H524.182Z" fill="currentColor"/><path d="M529.582 40.7969V19.0236H544.209C552.369 19.0236 557.275 22.8236 557.275 29.5436C557.275 36.2636 551.969 40.7969 544.035 40.7969H529.582ZM537.435 35.7169H542.742C546.635 35.7169 548.995 33.3836 548.995 29.7036C548.995 26.0236 546.542 24.0903 542.929 24.0903H537.435V35.7169Z" fill="currentColor"/><rect x="16.3887" y="53.3303" width="540.547" height="8.37949" fill="url(#aaUnity)"/></svg>`,
+  s: `<svg class="lk lk-s" aria-hidden="true" focusable="false" viewBox="37.707 45.538 270.762 58.924" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M55.234 46.1841L63.9916 65.0264H56.7224L55.2686 61.4495H46.4301L44.9763 65.0264H37.707L46.4647 46.1841H55.2455H55.234ZM48.0686 57.3533H53.6186L52.2916 54.088C51.9686 53.2918 51.2301 51.2495 50.884 50.0264H50.8032C50.4801 51.2495 49.7186 53.2918 49.3955 54.088L48.0686 57.3533Z" fill="currentColor"/><path d="M66.8532 65.0264V46.1841H76.9032L80.2724 55.761C80.5955 56.661 80.884 57.411 80.9647 58.1264H81.0224C81.1032 57.411 81.3916 56.638 81.7147 55.7149L84.957 46.1841H95.284V65.0264H89.0763V54.6764C89.0763 53.488 89.2032 52.0803 89.4455 50.6957H89.3186C89.157 51.3649 88.5455 53.1649 88.0493 54.4341L83.9647 65.0149H77.6532L73.8109 54.4803C73.2801 53.0264 72.8532 51.5841 72.6109 50.6841H72.507C72.7493 51.9303 72.7724 53.3957 72.7724 54.6649V65.0149H66.8878L66.8532 65.0264Z" fill="currentColor"/><path d="M122.607 59.5572C122.607 62.211 120.749 65.0264 115.28 65.0264H99.9455V46.1841H115.176C119.895 46.1841 122.157 48.0418 122.157 50.8803C122.157 52.7957 120.934 54.4572 118.234 55.0226C121.13 55.4495 122.607 57.0418 122.607 59.5572ZM106.742 50.3726V53.5341H113.111C114.68 53.5341 115.072 52.6572 115.072 51.861C115.072 51.0649 114.645 50.3726 113.111 50.3726H106.742ZM113.376 60.8264C114.888 60.8264 115.522 59.9264 115.522 58.9918C115.522 58.011 114.784 57.2957 113.376 57.2957H106.742V60.8264H113.376Z" fill="currentColor"/><path d="M125.988 65.0264V46.1841H132.784V65.0264H125.988Z" fill="currentColor"/><path d="M156.922 46.1841V51.3533H149.676V65.0149H142.88V51.3533H135.634V46.1841H156.922Z" fill="currentColor"/><path d="M159.795 65.0264V46.1841H166.592V65.0264H159.795Z" fill="currentColor"/><path d="M169.592 55.5995C169.592 49.4495 174.553 45.538 182.376 45.538C190.199 45.538 195.138 49.438 195.138 55.5995C195.138 61.761 190.234 65.6495 182.376 65.6495C174.519 65.6495 169.592 61.7495 169.592 55.5995ZM187.972 55.5995C187.972 52.4957 185.769 50.4533 182.376 50.4533C178.984 50.4533 176.745 52.4957 176.745 55.5995C176.745 58.7033 178.972 60.7457 182.376 60.7457C185.78 60.7457 187.972 58.6803 187.972 55.5995Z" fill="currentColor"/><path d="M198.172 65.0264V46.1841H205.199L212.919 54.9649C213.426 55.5533 214.084 56.4764 214.511 57.2957H214.649V46.1726H220.776V65.0149H214.142L206.076 56.2341C205.546 55.6457 204.726 54.5149 204.461 53.8457H204.322V65.0149H198.172V65.0264Z" fill="currentColor"/><path d="M55.234 69.838L63.9916 88.6803H56.7224L55.2686 85.1033H46.4301L44.9763 88.6803H37.707L46.4647 69.838H55.2455H55.234ZM48.0686 81.0072H53.6186L52.2916 77.7418C51.9686 76.9457 51.2301 74.9033 50.884 73.6803H50.8032C50.4801 74.9033 49.7186 76.9457 49.3955 77.7418L48.0686 81.0072Z" fill="currentColor"/><path d="M64.1301 79.3572C64.1301 73.4149 69.3801 69.1918 76.834 69.1918C83.0416 69.1918 87.7147 71.9033 88.984 76.2533L81.957 77.5803C81.4032 75.3995 79.6263 74.2341 76.834 74.2341C73.3839 74.2341 71.284 76.1726 71.284 79.2533C71.284 82.3341 73.3493 84.238 76.834 84.238C79.6493 84.238 81.4493 83.0726 81.9801 80.9264L88.9378 82.461C87.4263 86.788 82.8917 89.3033 76.6263 89.3033C69.0109 89.3033 64.1301 85.4264 64.1301 79.3572Z" fill="currentColor"/><path d="M90.934 79.3572C90.934 73.4149 96.184 69.1918 103.638 69.1918C109.845 69.1918 114.519 71.9033 115.788 76.2533L108.761 77.5803C108.207 75.3995 106.43 74.2341 103.638 74.2341C100.188 74.2341 98.0878 76.1726 98.0878 79.2533C98.0878 82.3341 100.153 84.238 103.638 84.238C106.453 84.238 108.253 83.0726 108.784 80.9264L115.73 82.461C114.219 86.788 109.684 89.3033 103.419 89.3033C95.8032 89.3033 90.9224 85.4264 90.9224 79.3572H90.934Z" fill="currentColor"/><path d="M138.138 77.0841V81.2726H125.688V84.111H138.772V88.6803H118.903V69.838H138.588V74.4072H125.688V77.0841H138.138Z" fill="currentColor"/><path d="M142.811 88.6803V69.838H149.607V83.4764H161.492V88.6803H142.811Z" fill="currentColor"/><path d="M183.992 77.0841V81.2726H171.553V84.111H184.638V88.6803H164.769V69.838H184.453V74.4072H171.553V77.0841H183.992Z" fill="currentColor"/><path d="M203.399 88.6803L199.419 82.5303H195.461V88.6803H188.665V69.838H201.853C208.349 69.838 210.242 72.9649 210.242 76.0226C210.242 78.1457 209.261 80.5572 206.319 81.7226L210.888 88.6687H203.399V88.6803ZM195.461 74.1649V78.4687H200.238C202.419 78.4687 203.076 77.4649 203.076 76.2649C203.076 75.0649 202.384 74.1649 200.261 74.1649H195.461Z" fill="currentColor"/><path d="M230.249 69.838L239.007 88.6803H231.738L230.284 85.1033H221.445L219.992 88.6803H212.722L221.48 69.838H230.261H230.249ZM223.084 81.0072H228.634L227.307 77.7418C226.984 76.9457 226.245 74.9033 225.899 73.6803H225.819C225.495 74.9033 224.734 76.9457 224.411 77.7418L223.084 81.0072Z" fill="currentColor"/><path d="M257.722 69.838V75.0072H250.476V88.6687H243.68V75.0072H236.434V69.838H257.722Z" fill="currentColor"/><path d="M279.83 77.0841V81.2726H267.392V84.111H280.476V88.6803H260.607V69.838H280.292V74.4072H267.392V77.0841H279.83Z" fill="currentColor"/><path d="M284.503 88.6803V69.838H297.161C304.222 69.838 308.469 73.1264 308.469 78.9418C308.469 84.7572 303.876 88.6803 297.011 88.6803H284.503ZM291.288 84.2726H295.88C299.249 84.2726 301.292 82.2533 301.292 79.0687C301.292 75.8841 299.169 74.211 296.042 74.211H291.288V84.2726Z" fill="currentColor"/><rect x="37.707" y="98.1649" width="270.762" height="6.29714" fill="url(#aaUnity)"/></svg>`,
+  m: `<svg class="lk lk-m" aria-hidden="true" focusable="false" viewBox="0 0 105 68" fill="none" xmlns="http://www.w3.org/2000/svg"><rect y="23.7299" width="104.503" height="18.6372" fill="url(#aaUnity)"/><path d="M58.0068 0L71.8615 29.8085H60.3616L58.0616 24.1498H44.0792L41.7792 29.8085H30.2793L44.1339 0H58.0251H58.0068ZM46.6712 17.6879H55.4513L53.3521 12.5221C52.841 11.2626 51.6728 8.03168 51.1252 6.09677H50.9974C50.4863 8.03168 49.2815 11.2626 48.7704 12.5221L46.6712 17.6879Z" fill="currentColor"/><path d="M58.0068 37.4203L71.8615 67.2288H60.3616L58.0616 61.5701H44.0792L41.7792 67.2288H30.2793L44.1339 37.4203H58.0251H58.0068ZM46.6712 55.1083H55.4513L53.3521 49.9424C52.841 48.6829 51.6728 45.452 51.1252 43.5171H50.9974C50.4863 45.452 49.2815 48.6829 48.7704 49.9424L46.6712 55.1083Z" fill="currentColor"/></svg>`,
+};
+const RM = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const wait = ms => new Promise(r => setTimeout(r, RM ? Math.min(ms, 60) : ms));
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+/* wrap [bracketed] client-data placeholders */
+const ph = s => s.replace(/\[([^\]]+)\]/g, '<span class="ph">[$1]</span>');
+const nn = i => String(i + 1).padStart(2, "0");
+
+/* functional glyphs only */
+
+
+
+/* =========================================================
+   SCENARIO CONTENT — all figures are bracketed placeholders.
+   Real orgs named as resource types only; people are samples.
+   ========================================================= */
+const SC = {
+  hq: {
+    intent: "headquarters relocation · financial services",
+    ack: "A headquarters move. We'll weigh what matters to a leadership team relocating.",
+    focus: "Palm Beach County", counties: ["pbc"], nodes: ["wpb","boca","jup"], primary: "wpb",
+    headline: `A Palm Beach headquarters.`,
+    summary: m => `West Palm Beach or Boca Raton, with Broward and Miami-Dade in the same region for talent, clients and capital. Here's what a move from ${m} looks like: what works in your favour, who can help, and who to meet first.`,
+    matchLine: "tax climate · Class-A office · connectivity · financial-services talent",
+    orgsLine: "FloridaCommerce · Business Development Board of Palm Beach County",
+    adv: [
+      {ic:"percent", t:"No state personal income tax", d: m => `Florida levies no personal income tax — a direct advantage for partners and senior staff relocating from ${m}.`, p: () => `Modelled impact for your team: [$X / yr — to verify with your advisors]`, s:3},
+      {ic:"space", t:"Class-A office, ready when you are", d: () => `Downtown and waterfront options in West Palm Beach and Boca Raton, with interim space while you build out.`, p: m => `[X] sq ft available · [X]% occupancy cost vs. ${m} — to verify`, s:3},
+      {ic:"globe", t:"Still close to home base", d: m => `Three international airports — PBI, FLL and MIA — keep clients and your ${m} office within same-day reach.`, p: m => `[X] daily nonstops to ${m} — to verify`, s:2},
+      {ic:"trend", t:"A financial-services community", d: () => `Investment, wealth and family-office firms across the region to recruit from, partner with and learn from.`, p: () => `[X] firms relocated since [year] — to verify`, s:2},
+    ],
+    programs: [
+      {t:"Site selection & relocation support", o:"Business Development Board of Palm Beach County", g:"Economic development", d:"Confidential site tours, real-estate shortlists and local introductions."},
+      {t:"State incentives review", o:"FloridaCommerce", g:"State agency", d:"Review of programs your project may qualify for — [eligibility to confirm]."},
+      {t:"Recruiting & training support", o:"CareerSource Palm Beach County", g:"Workforce", d:"Hiring events and training grants for local hires — [program fit to confirm]."},
+      {t:"48-Hour Business Trip", o:"Gold Coast 2027", g:"Experience", d:"A curated two-day visit: shortlisted sites, peer CEOs and state and local leadership.", gold:true},
+    ],
+    partners: [
+      {m:"FAU", n:"Florida Atlantic University", r:"Talent pipeline · Boca Raton"},
+      {m:"UM", n:"University of Miami", r:"Business & finance talent"},
+      {m:"PBSC", n:"Palm Beach State College", r:"Workforce training"},
+      {m:"PBI", n:"Palm Beach International Airport", r:"Connectivity"},
+    ],
+    people: [
+      {i:"DW", n:"Dana Whitfield", r:"Relationship lead, HQ projects", o:"Florida Deal Team", w:"Your single point of contact — coordinates every introduction below."},
+      {i:"MB", n:"Marcus Bell", r:"Business development, corporate relocation", o:"Business Development Board of Palm Beach County", w:"Runs confidential site tours and local incentive conversations."},
+      {i:"EO", n:"Elena Ortiz", r:"Talent partnerships", o:"CareerSource Palm Beach County", w:"Builds a hiring plan for the roles you'll fill locally."},
+    ],
+    days: [
+      ["Explore", ["Confidential briefing with your deal team", "Shortlist sites in West Palm Beach and Boca Raton", "Incentives pre-screen"]],
+      ["Visit", ["48-Hour Business Trip: sites + peer CEO dinner", "Meet talent partners and universities", "Executive family orientation: schools & housing"]],
+      ["Commit", ["Interim space and build-out plan", "Local hiring plan with workforce partners", "Announcement plan with state & local partners"]],
+    ],
+    story: {t: m => `From ${m} to West Palm Beach`, co:"[Company name] · Investment management", d:"How a firm moved its headquarters, kept its clients close and rebuilt its leadership bench in a new home.", s:[["[X] months","to open the new HQ"],["[X] roles","hired locally"]]},
+    faq: [
+      ["What would the move actually cost?", m => `Every move is different, so we don't quote a single number. Your deal team can build a side-by-side of ${m} vs. the Gold Coast — occupancy, payroll and tax — once we know headcount and timing. [Cost model — prepared with client data]`],
+      ["Can this stay confidential?", () => `Yes. Early conversations can be held confidentially, and relocation projects often run under a code name until you're ready to announce.`],
+      ["Where would our people live?", () => `Your relocation lead will put together a short neighbourhood guide built around commute, schools and lifestyle — from downtown West Palm Beach to Boca Raton and Jupiter.`],
+    ],
+  },
+
+  life: {
+    intent: "life-sciences expansion · lab space & research talent",
+    ack: "Lab space and research neighbours. We'll look at institutes, wet labs and scientific talent.",
+    focus: "Jupiter corridor & Miami", counties: ["pbc","mdc"], nodes: ["jup","boca","mia"], primary: "jup",
+    headline: `A lab in the Jupiter corridor.`,
+    summary: m => `Two anchors for a life-sciences team from ${m}: the research corridor in Jupiter, in northern Palm Beach County, and Miami's academic medical community. Here's what it takes to get a lab running and staffed.`,
+    matchLine: "research institutes · wet-lab space · clinical access · scientific talent",
+    orgsLine: "Business Development Board of Palm Beach County · Miami-Dade Beacon Council",
+    adv: [
+      {ic:"flask", t:"Research neighbours", d: () => `Jupiter is home to the Max Planck Florida Institute for Neuroscience and the UF Scripps research campus.`, p: () => `[X] research institutions within [X] minutes — to verify`, s:3},
+      {ic:"space", t:"Wet-lab space options", d: () => `Purpose-built and convertible lab space across Jupiter, Boca Raton and Miami, including university-adjacent sites.`, p: m => `[X] sq ft available · [X]% rent vs. ${m} — to verify`, s:3},
+      {ic:"pulse", t:"Clinical access", d: () => `Large, diverse patient populations and major health systems for trials and partnerships.`, p: () => `[X] active trial sites — to verify`, s:2},
+      {ic:"cap", t:"Scientific talent pipeline", d: () => `Graduates from the University of Miami, FAU, FIU and Nova Southeastern, plus researchers relocating south.`, p: () => `[X] life-sciences graduates / yr — to verify`, s:2},
+    ],
+    programs: [
+      {t:"Life-sciences site search", o:"Business Development Board of Palm Beach County", g:"Economic development", d:"Lab-capable site shortlists in the Jupiter corridor and Boca Raton."},
+      {t:"Sector recruitment support", o:"Miami-Dade Beacon Council", g:"Economic development", d:"Introductions across Miami's academic medical and research community."},
+      {t:"Incentives & grants review", o:"FloridaCommerce", g:"State agency", d:"Review of programs your project may qualify for — [eligibility to confirm]."},
+      {t:"Research corridor Familiarization Tour", o:"Gold Coast 2027", g:"Experience", d:"A guided day across institutes, lab sites and university partnership offices.", gold:true},
+    ],
+    partners: [
+      {m:"MPFI", n:"Max Planck Florida Institute for Neuroscience", r:"Research · Jupiter"},
+      {m:"UFS", n:"UF Scripps (Jupiter campus)", r:"Biomedical research"},
+      {m:"UM", n:"University of Miami Miller School of Medicine", r:"Academic medicine · Miami"},
+      {m:"FAU", n:"Florida Atlantic University", r:"Jupiter & Boca Raton campuses"},
+    ],
+    people: [
+      {i:"PR", n:"Priya Raman", r:"Relationship lead, life sciences", o:"Florida Deal Team", w:"Your single point of contact — coordinates every introduction below."},
+      {i:"TC", n:"Thomas Cole", r:"Life-sciences business development", o:"Business Development Board of Palm Beach County", w:"Knows every lab-capable site in the Jupiter corridor."},
+      {i:"AL", n:"Ana Lucía Vega", r:"Sector lead, life sciences & healthcare", o:"Miami-Dade Beacon Council", w:"Connects you to Miami's health systems and research offices."},
+    ],
+    days: [
+      ["Explore", ["Define lab spec: biosafety level, vivarium, footprint", "Shortlist Jupiter vs. Miami sites", "Incentives & grants pre-screen"]],
+      ["Visit", ["Research corridor Familiarization Tour", "Meet institute partnership offices", "Clinical partner introductions"]],
+      ["Commit", ["Letter of intent on lab space", "Lab-tech hiring plan with local colleges", "Draft research collaboration terms"]],
+    ],
+    story: {t: m => `From ${m} to the research corridor`, co:"[Company name] · Biotech", d:"How a growing biotech stood up a Florida lab next to an established institute — and what it took to recruit its first scientists.", s:[["[X] months","lab to first experiment"],["[X] scientists","recruited"]]},
+    faq: [
+      ["How fast can we get a lab running?", () => `It depends on your spec. Some sites offer move-in-ready or incubator space while a permanent lab is fitted out — your deal team can map both paths. [Timeline — to confirm per site]`],
+      ["Who funds early-stage biotech here?", () => `We can introduce regional investors, family offices and university venture programmes active in life sciences. [Investor list — to be curated]`],
+      ["Can we partner with a university?", () => `Each institution has a partnerships or tech-transfer office. We'd start with a joint introductory call and bring the right faculty in from there.`],
+    ],
+  },
+
+  talent: {
+    intent: "tech team expansion · engineering talent & capital",
+    ack: "A team to build. We'll look at talent, community and capital.",
+    focus: "Miami & Fort Lauderdale", counties: ["mdc","bro"], nodes: ["mia","ftl","boca"], primary: "mia",
+    headline: `An engineering hub in Miami.`,
+    summary: m => `A hub in Miami or Fort Lauderdale puts a team from ${m} next to university pipelines, an active founder and investor community, and people who work across the Americas. Here's how to hire your first cohort.`,
+    matchLine: "university pipeline · tech community · compensation · Americas reach",
+    orgsLine: "Miami-Dade Beacon Council · Greater Fort Lauderdale Alliance · CareerSource",
+    adv: [
+      {ic:"cap", t:"University pipeline", d: () => `Computing and engineering graduates from FIU, the University of Miami, FAU and Miami Dade College.`, p: () => `[X] CS & engineering graduates / yr — to verify`, s:3},
+      {ic:"spark", t:"A community that shows up", d: () => `eMerge Americas, Refresh Miami and a busy calendar of founder and investor events.`, p: () => `[Ecosystem data — to verify]`, s:3},
+      {ic:"percent", t:"Offers that go further", d: () => `Competitive compensation and no state personal income tax help your offers stand out.`, p: m => `[X]% salary delta vs. ${m} — to verify`, s:2},
+      {ic:"globe", t:"Americas-ready teams", d: () => `Bilingual talent and time-zone overlap with Latin America for engineering, support and sales.`, p: () => `[X]% bilingual workforce — to verify`, s:2},
+    ],
+    programs: [
+      {t:"Tech hiring events & training grants", o:"CareerSource South Florida · CareerSource Broward", g:"Workforce", d:"Recruiting events and training support for local hires — [program fit to confirm]."},
+      {t:"Tech sector business development", o:"Miami-Dade Beacon Council", g:"Economic development", d:"Site options, ecosystem introductions and incentive navigation."},
+      {t:"Expansion support", o:"Greater Fort Lauderdale Alliance", g:"Economic development", d:"Office options and introductions across Broward County."},
+      {t:"Gold Coast Deal Flow", o:"Gold Coast 2027", g:"Capital", d:"Curated introductions to regional VCs and family offices.", gold:true},
+      {t:"Talent Talks", o:"Gold Coast 2027", g:"Recruiting", d:"Recruit on campus alongside the state's talent story.", gold:true},
+    ],
+    partners: [
+      {m:"FIU", n:"Florida International University", r:"Computing & engineering"},
+      {m:"MDC", n:"Miami Dade College", r:"Tech training programmes"},
+      {m:"eMA", n:"eMerge Americas", r:"Tech conference & community"},
+      {m:"BC", n:"Broward College", r:"Workforce pipeline"},
+    ],
+    people: [
+      {i:"JL", n:"Jordan Lee", r:"Relationship lead, technology", o:"Florida Deal Team", w:"Your single point of contact — coordinates every introduction below."},
+      {i:"SM", n:"Sofia Méndez", r:"Technology sector lead", o:"Miami-Dade Beacon Council", w:"Opens doors to founders, landlords and the tech community."},
+      {i:"RK", n:"Ryan Kim", r:"Talent solutions", o:"CareerSource South Florida", w:"Plans hiring events for your first local cohort."},
+    ],
+    days: [
+      ["Explore", [m => `Role map: what to hire here vs. ${m}`, "Shortlist Brickell, Wynwood or downtown Fort Lauderdale", "Incentives pre-screen"]],
+      ["Visit", ["48-Hour Business Trip with founder dinner", "Campus visits: FIU, UM, Miami Dade College", "Investor roundtable via Gold Coast Deal Flow"]],
+      ["Commit", ["Open interim or co-working space", "First hiring event with workforce partners", "Talent Talks campus partnership"]],
+    ],
+    story: {t: () => `Shipping from Miami`, co:"[Company name] · Software", d:"How a growing software company opened a second engineering hub — and how it recruited its first local cohort.", s:[["[X] engineers","hired in year one"],["[X] weeks","to first local hire"]]},
+    faq: [
+      ["How quickly could we hire?", () => `Your workforce partners can run a hiring event once roles are defined, and universities can open co-op and capstone pipelines for the next intake. [Hiring timeline — to confirm]`],
+      ["Can you help us raise capital?", () => `Through Gold Coast Deal Flow we can introduce regional VCs, angels and family offices that match your stage. [Investor list — to be curated]`],
+      ["Where should the office be?", () => `Most tech teams compare Brickell, Wynwood and downtown Fort Lauderdale. We'll set up a half-day tour of all three so your team can feel the difference.`],
+    ],
+  },
+
+  latam: {
+    intent: "Americas hub · Latin America operations",
+    ack: "An Americas hub. We'll look at gateways, bilingual talent and trade.",
+    focus: "Miami-Dade & Broward", counties: ["mdc","bro"], nodes: ["mia","dor","ftl"], primary: "mia",
+    headline: `Run the Americas from Miami.`,
+    summary: m => `A Miami-Dade or Broward hub puts a company from ${m} next to major gateways to Latin America, by air and by sea, with a bilingual workforce for sales, operations and support. Here's how to get it open.`,
+    matchLine: "air & sea gateways · bilingual talent · regional HQ peers · trade infrastructure",
+    orgsLine: "Miami-Dade Beacon Council · Greater Fort Lauderdale Alliance · FloridaCommerce",
+    adv: [
+      {ic:"anchor", t:"Air & sea gateways", d: () => `Miami International Airport, PortMiami and Port Everglades connect you to markets across Latin America and the Caribbean.`, p: () => `[X] nonstop Latin America destinations — to verify`, s:3},
+      {ic:"chat", t:"Bilingual workforce", d: () => `Spanish- and Portuguese-speaking talent for sales, customer success and operations.`, p: () => `[X]% bilingual workforce — to verify`, s:3},
+      {ic:"users", t:"Regional HQ peers", d: () => `Multinationals already run Latin America operations from the region — peers, advisors and service providers are close by.`, p: () => `[X] multinational regional HQs — to verify`, s:2},
+      {ic:"route", t:"Trade infrastructure", d: () => `Logistics corridors around Doral and the ports, plus Foreign-Trade Zone options for eligible operations.`, p: () => `[FTZ eligibility — to confirm]`, s:2},
+    ],
+    programs: [
+      {t:"International business development", o:"Miami-Dade Beacon Council", g:"Economic development", d:"Site options, peer introductions and incentive navigation in Miami-Dade."},
+      {t:"Expansion & logistics site support", o:"Greater Fort Lauderdale Alliance", g:"Economic development", d:"Office and logistics options near Port Everglades and FLL."},
+      {t:"Trade & export resources", o:"FloridaCommerce", g:"State agency", d:"International trade support — [programme availability to confirm]."},
+      {t:"Bilingual hiring support", o:"CareerSource South Florida", g:"Workforce", d:"Recruiting events for sales, support and operations roles."},
+      {t:"Governor's Table", o:"Gold Coast 2027", g:"Access", d:"A seat at a small-group conversation with state leadership.", gold:true},
+    ],
+    partners: [
+      {m:"PM", n:"PortMiami", r:"Sea gateway"},
+      {m:"PEV", n:"Port Everglades", r:"Sea gateway · Broward"},
+      {m:"MIA", n:"Miami International Airport", r:"Air gateway & cargo"},
+      {m:"FIU", n:"Florida International University", r:"International business talent"},
+    ],
+    people: [
+      {i:"CN", n:"Carla Nunes", r:"Relationship lead, international", o:"Florida Deal Team", w:"Your single point of contact — coordinates every introduction below."},
+      {i:"DA", n:"Diego Alvarez", r:"International business development", o:"Miami-Dade Beacon Council", w:"Introduces you to regional HQ peers and service providers."},
+      {i:"KW", n:"Kate Walsh", r:"Logistics & trade", o:"Greater Fort Lauderdale Alliance", w:"Maps logistics sites around Port Everglades."},
+    ],
+    days: [
+      ["Explore", ["Map the Latin America markets served from the hub", "Shortlist Brickell, Doral or Fort Lauderdale", "Trade & FTZ pre-screen"]],
+      ["Visit", ["Port and logistics tour", "Dinner with regional HQ peers", "Bilingual talent session"]],
+      ["Commit", ["Entity and site decision", "Hire your Americas lead", "Launch plan with partners"]],
+    ],
+    story: {t: () => `Opening the Americas office`, co:"[Company name] · Consumer goods", d:"How a growing company moved its Latin America leadership to Miami — and what changed for its teams across the region.", s:[["[X] markets","served from the hub"],["[X] months","from decision to open"]]},
+    faq: [
+      ["Which markets can we cover from here?", () => `Teams commonly cover Latin America and the Caribbean from the region. Your deal team can map flight access and time zones for your specific markets. [Market coverage map — to prepare]`],
+      ["Do we need a separate entity?", () => `That depends on your structure. We'd introduce you to local legal and tax advisors who set up Americas hubs regularly. [Advisor shortlist — to curate]`],
+      ["Where do logistics teams set up?", () => `Many look at Doral and the areas around the ports and airports. We can arrange a logistics-focused site tour.`],
+    ],
+  },
+};
+
+/* =========================================================
+   LIVED IT films — one cut per scenario (see success-stories/script-v2.md)
+   ========================================================= */
+const FILM_DIR = "films/";
+const FILMS = {
+  hq:     {t:"The Headquarters", len:"0:55"},
+  life:   {t:"The Lab",          len:"0:55"},
+  talent: {t:"The Team",         len:"0:55"},
+  latam:  {t:"The Americas",     len:"0:55"},
+};
+const filmSrc = (k, vert) => `${FILM_DIR}lived-it-${k}${vert ? "-9x16" : ""}.mp4`;
+const mmss = s => `${Math.floor(s/60)}:${String(Math.round(s%60)).padStart(2,"0")}`;
+
+/* chips → scenario */
+const NEEDS = [
+  {t:"Relocate our headquarters", ic:"key", s:"hq"},
+  {t:"Expand a fintech team", ic:"trend", s:"talent"},
+  {t:"Find life-sciences lab space", ic:"flask", s:"life"},
+  {t:"Hire engineering talent", ic:"cap", s:"talent"},
+  {t:"Raise capital", ic:"capital", s:"talent"},
+  {t:"Set up an Americas / LatAm hub", ic:"globe", s:"latam"},
+];
+const MARKETS = [["New York","New York"],["Bay Area","the Bay Area"],["Chicago","Chicago"],["Boston","Boston"],["Los Angeles","Los Angeles"],["Somewhere else",null]];
+const SIZES = ["Under 50","50–250","250–1,000","1,000+"];
+
+const KW = {
+  hq: /head ?quarter|\bhq\b|relocat|\bmove\b|moving|office|hedge|asset|wealth|family office|bank|invest|private equity|insurance|corporate/i,
+  life: /\blab\b|labs|bio|life.?science|pharma|medic|clinic|health|research|wet|diagnos|therap|device|genom/i,
+  talent: /engineer|talent|hire|hiring|recruit|developer|software|\btech|\bai\b|fintech|startup|start-up|capital|raise|funding|investor|\bvc\b|saas|data|product team/i,
+  latam: /latam|latin|americas|export|import|trade|logistic|\bport|shipping|supply chain|brazil|mexico|colombia|caribbean|spanish|international|regional hub|distribution/i,
+};
+function detectScenario(text){
+  let best = null, score = 0;
+  for (const k of Object.keys(KW)) {
+    const m = text.match(new RegExp(KW[k].source, "gi"));
+    const n = m ? m.length : 0;
+    if (n > score) { score = n; best = k; }
+  }
+  return best;
+}
+function detectMarket(text){
+  const t = text.trim();
+  if (/new york|\bnyc\b|manhattan|brooklyn|\bny\b/i.test(t)) return "New York";
+  if (/bay area|san francisco|\bsf\b|silicon valley|palo alto|oakland|san jose/i.test(t)) return "the Bay Area";
+  if (/chicago/i.test(t)) return "Chicago";
+  if (/boston|cambridge|massachusetts/i.test(t)) return "Boston";
+  if (/los angeles|\bla\b|l\.a\./i.test(t)) return "Los Angeles";
+  const clean = t.replace(/^(we('| a)re|i('| a)m|based|in|from|out of)\s+/gi,"").replace(/[.!]+$/,"").slice(0,32);
+  return clean ? clean.replace(/\b\w/g, c => c.toUpperCase()) : "your current market";
+}
+function detectSize(text){
+  const n = parseInt(String(text).replace(/[, ]/g,"").match(/\d+/)?.[0] || "", 10);
+  if (isNaN(n)) return text.trim().slice(0,24) || "—";
+  if (n < 50) return "Under 50"; if (n <= 250) return "50–250"; if (n <= 1000) return "250–1,000"; return "1,000+";
+}
+
+
+/* v4: shorter 2-line leads for the plan top (the long v3 summaries are kept above for reference) */
+const LEAD = {
+  hq:     m => `West Palm Beach or Boca Raton: your move from ${m}, mapped.`,
+  life:   m => `The Jupiter research corridor, with Miami close by: your lab, mapped.`,
+  talent: m => `Miami or Fort Lauderdale: your first local cohort, mapped.`,
+  latam:  m => `Miami-Dade or Broward, the gateway south: your hub, mapped.`,
+};
+const COUNTIES = [
+  {k:"pbc", n:"Palm Beach County", c:"West Palm Beach · Boca Raton · Jupiter"},
+  {k:"bro", n:"Broward County",    c:"Fort Lauderdale"},
+  {k:"mdc", n:"Miami-Dade County", c:"Miami · Doral"},
+];
+/* Image slots — AI stills dropped in later; each slot has a designed fallback underneath */
+const STILLS = "stills/";
+const still = name => `<img class="still" src="${STILLS}${name}.jpg" alt="" decoding="async" onload="this.classList.add('ok')" onerror="this.remove()"><span class="ai">AI generated</span>`;
+
+/* functional glyphs */
+const I = {
+  check: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`,
+  arrow: `<svg class="ar" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 9h13M10 4l5 5-5 5"/></svg>`,
+  plus:  `<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M6 0v12M0 6h12"/></svg>`,
+  play:  `<svg viewBox="0 0 18 18" fill="currentColor"><path d="M3 1.5v15L16 9z"/></svg>`,
+  close: `<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3l12 12M15 3L3 15"/></svg>`,
+};
+
+/* =========================================================
+   MAP (SE Florida, simplified from real coordinates)
+   ========================================================= */
+const LAT0 = 27.03, LAT1 = 25.30, LON0 = -80.95, LON1 = -79.62, K = 400, CX = Math.cos(26.2 * Math.PI/180);
+const W = Math.round((LON1-LON0)*CX*K), H = Math.round((LAT0-LAT1)*K);
+const px = lon => (lon-LON0)*CX*K, py = lat => (LAT0-lat)*K;
+const COAST = [[27.03,-80.082],[26.945,-80.072],[26.85,-80.045],[26.77,-80.035],[26.60,-80.035],[26.53,-80.048],[26.45,-80.060],[26.35,-80.072],[26.26,-80.083],[26.15,-80.095],[26.08,-80.108],[25.98,-80.118],[25.935,-80.125],[25.90,-80.158],[25.85,-80.180],[25.77,-80.188],[25.72,-80.235],[25.65,-80.285],[25.58,-80.318],[25.50,-80.335],[25.42,-80.330],[25.35,-80.372],[25.30,-80.400]];
+function coastLon(lat){
+  for (let i=0;i<COAST.length-1;i++){
+    const [a,la] = COAST[i], [b,lb] = COAST[i+1];
+    if (lat <= a && lat >= b) return la + (lb-la)*((a-lat)/(a-b));
+  }
+  return -80.4;
+}
+const county = lat => lat > 26.322 ? "pbc" : lat > 25.957 ? "bro" : "mdc";
+const NODES = {
+  jup:{n:"Jupiter", lat:26.934, lon:-80.094},
+  wpb:{n:"West Palm Beach", lat:26.715, lon:-80.053},
+  boca:{n:"Boca Raton", lat:26.368, lon:-80.128},
+  ftl:{n:"Fort Lauderdale", lat:26.122, lon:-80.137},
+  mia:{n:"Miami", lat:25.774, lon:-80.193},
+  dor:{n:"Doral", lat:25.819, lon:-80.355, left:true},
+};
+/* variant: "map" (legible plan map) · "hero" (start-screen fallback) · "poster" (film fallback) */
+function mapSVG({focus=[], on=[], primary=null, from=null, variant="map", vb=null, par="xMidYMid meet", labels=true}={}){
+  const step = 0.0215, out = [];
+  for (let lat = LAT0-0.01; lat > LAT1; lat -= step){
+    const cl = coastLon(lat);
+    for (let x = 8; x < W; x += step*K){
+      const lon = LON0 + x/(CX*K);
+      if (lon > cl - 0.006) break;
+      const f = focus.includes(county(lat));
+      out.push(`<circle class="dot${f?" f":""}" cx="${x.toFixed(1)}" cy="${py(lat).toFixed(1)}" r="1.8"/>`);
+    }
+  }
+  const coast = COAST.map(([la,lo]) => `${px(lo).toFixed(1)},${py(la).toFixed(1)}`).join(" ");
+  const cl = lat => `<line class="cline" x1="0" y1="${py(lat)}" x2="${px(coastLon(lat))}" y2="${py(lat)}"/>`;
+  const clab = (lat, t, k) => `<text class="clab${focus.includes(k)?" f":""}" x="16" y="${py(lat)}">${t}</text>`;
+  let nodes = "";
+  if (labels) for (const [k,v] of Object.entries(NODES)){
+    const isOn = on.includes(k);
+    if (variant === "map" || isOn){
+      const x = px(v.lon), y = py(v.lat), isP = k === primary;
+      const tx = v.left ? x-14 : x+14;
+      nodes += `<g class="node${isOn?" on":""}${isP?" p":""}">${isP?`<circle class="ring" cx="${x}" cy="${y}" r="11"/>`:""}<circle class="c" cx="${x}" cy="${y}" r="${isP?5.5:4.5}"/><text x="${tx}" y="${y+6}" text-anchor="${v.left?"end":"start"}">${v.n}</text></g>`;
+    }
+  }
+  let arc = "";
+  if (primary && from){
+    const p = NODES[primary], x = px(p.lon), y = py(p.lat);
+    const sx = W-22, sy = 34;
+    arc = `<path class="arc" d="M${sx},${sy} C${W+4},${(sy+y)/2} ${x+70},${y-40} ${x+10},${y-8}"/><circle class="arcdot" cx="${sx}" cy="${sy}" r="4"/><text class="arclab" x="${sx}" y="${sy-16}" text-anchor="end">From ${esc(from)}</text>`;
+  }
+  const county3 = variant === "map" ? `${cl(26.322)}${cl(25.957)}${clab(26.86,"Palm Beach","pbc")}${clab(26.27,"Broward","bro")}${clab(25.66,"Miami-Dade","mdc")}` : "";
+  return `<svg class="gcmap ${variant}" viewBox="${vb || `0 0 ${W} ${H}`}" preserveAspectRatio="${par}" role="img" aria-label="Map of Florida's Gold Coast: Palm Beach, Broward and Miami-Dade counties">
+    <g>${out.join("")}</g>
+    ${county3}
+    <polyline class="coast" points="${coast}"/>
+    <line class="island" x1="${px(-80.121)}" y1="${py(25.935)}" x2="${px(-80.131)}" y2="${py(25.768)}"/>
+    <line class="island" x1="${px(-80.156)}" y1="${py(25.708)}" x2="${px(-80.160)}" y2="${py(25.668)}"/>
+    ${variant !== "poster" ? `<text class="ocean" x="${W-24}" y="${py(25.45)}" text-anchor="end">ATLANTIC OCEAN</text>` : ""}
+    ${arc}
+    <g>${nodes}</g>
+  </svg>`;
+}
+/* a 4:3 window onto the coast around a node — the film poster's fallback */
+function posterMap(sc){
+  const p = NODES[sc.primary], x = px(p.lon), y = py(p.lat), w = 440, h = 330;
+  const vx = Math.max(0, Math.min(W - w, x - w*.72)), vy = Math.max(0, Math.min(H - h, y - h*.5));
+  return mapSVG({focus:sc.counties, on:[], variant:"poster", vb:`${vx.toFixed(0)} ${vy.toFixed(0)} ${w} ${h}`, par:"xMidYMid slice", labels:false});
+}
+
+/* =========================================================
+   STATE + SCREEN SWITCHING
+   ========================================================= */
+const S = {};
+function resetState(){
+  Object.assign(S, {goal:"", scn:null, market:"", size:"", step:0, people:{}, busy:false, how:"Here at The Breakers", unmatched:false, answers:[]});
+}
+resetState();
+let timers = [];
+const later = (fn, ms) => { const t = setTimeout(fn, RM ? Math.min(ms, 40) : ms); timers.push(t); return t; };
+const clearTimers = () => { timers.forEach(clearTimeout); timers = []; };
+
+function show(html, cls){
+  clearTimers();
+  closeSheet(true);
+  closeFilm();
+  const app = $("#app");
+  const old = $$(".screen", app);
+  const el = document.createElement("section");
+  el.className = `screen ${cls}`;
+  el.innerHTML = html;
+  app.appendChild(el);
+  old.forEach(o => { o.classList.add("off"); o.classList.remove("on"); setTimeout(() => o.remove(), 460); });
+  requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add("on")));
+  wireLogo(el);
+  fit(el);
+  return el;
+}
+/* shrink display headlines until the longest word fits the column (expanded caps run wide) */
+function fit(root = document){
+  $$(".fit", root).forEach(e => {
+    e.style.fontSize = "";
+    let fs = parseFloat(getComputedStyle(e).fontSize), n = 0;
+    while (e.scrollWidth > e.clientWidth + 1 && fs > 14 && n++ < 120){ fs -= 1; e.style.fontSize = fs + "px"; }
+  });
+}
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => fit());
+let rz; window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => fit(), 120); });
+function reveal(root){
+  const els = $$(".rv, .sig", root);
+  if (!("IntersectionObserver" in window) || RM){ els.forEach(e => e.classList.add("in")); return; }
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } }), {root: root.querySelector(".scroll") || null, threshold: .06});
+  els.forEach(e => io.observe(e));
+}
+/* ONE header system: AA monogram + product name. The full wordmark only on start / done. */
+function topbar({right="", wordmark=false}={}){
+  return `<header class="top">
+    <button class="brand" data-logo aria-label="${BRAND.logoLabel} · ${BRAND.product}">${wordmark ? LOGO.h : `${LOGO.m}<span class="prod">${BRAND.product}</span>`}</button>
+    <div class="grow"></div>${right}
+  </header>`;
+}
+const PROTO = `<span class="chip">Prototype<span class="pl2">&nbsp;· sample data</span></span>`;
+/* hidden kiosk reset: double-tap the logo (or press Esc) */
+function wireLogo(root){
+  let last = 0;
+  $$("[data-logo]", root).forEach(b => b.addEventListener("click", e => {
+    e.stopPropagation();
+    const now = Date.now();
+    if (now - last < 450){ attract(); last = 0; } else last = now;
+  }));
+}
+function toast(msg){
+  const t = $("#toast");
+  t.textContent = msg;
+  t.classList.add("on");
+  clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("on"), 2600);
+}
+
+/* =========================================================
+   1. START — the promise, set against the place
+   ========================================================= */
+const EXAMPLES = [
+  "We need wet-lab space near a research university",
+  "We're moving our headquarters out of New York",
+  "We want an engineering hub that can hire fast",
+  "We need one office to run all of Latin America",
+  "We're raising a Series B and opening a second site",
+];
+function attract(){
+  resetState();
+  const el = show(`
+    ${topbar({wordmark:true})}
+    <main class="att">
+      <figure class="slot hero-slot rv" style="--d:0ms">
+        <div class="fb" aria-hidden="true">${mapSVG({on:["jup","wpb","boca","ftl"], variant:"hero", par:"xMaxYMid slice"})}</div>
+        ${still("hero")}
+        <figcaption class="place">
+          <span class="eyebrow rv" style="--d:260ms">Palm Beach · Broward · Miami-Dade</span>
+          <span class="pl hx2 rv" style="--d:340ms">Florida's<br>Gold Coast</span>
+        </figcaption>
+      </figure>
+      <div class="att-copy">
+        <h1><span class="l1 hx fit rv" style="--d:460ms">Tell us what you're building.</span><span class="l2 hx2 rv" style="--d:560ms">We'll show you<br>the way.</span></h1>
+        <div class="att-cta rv" style="--d:680ms">
+          <button class="btn" id="go" type="button">Start your plan ${I.arrow}</button>
+          <p class="meta"><span>About 60 seconds</span><span>Prototype · sample data</span></p>
+        </div>
+      </div>
+    </main>`, "attract");
+  requestAnimationFrame(() => requestAnimationFrame(() => $$(".rv", el).forEach(e => e.classList.add("in"))));
+  el.addEventListener("click", () => intake(), {once:true});
+}
+
+/* =========================================================
+   2. INTAKE — a typed questionnaire
+   ========================================================= */
+const QUESTIONS = [
+  {q:"What are you building?", sub:"One sentence is plenty. Or pick the closest.", ph:"e.g. Lab space near a university", short:"Goal"},
+  {q:"Where are you based today?", sub:"We'll compare everything against it.", ph:"Your city or region", short:"Based in"},
+  {q:"How many people?", sub:"Headcount for the move or expansion. A range is fine.", ph:"A number or a range", short:"Team size"},
+];
+function intake(){
+  S.answers = [];
+  const el = show(`
+    ${topbar({right:PROTO})}
+    <div class="utrack topline" aria-hidden="true"><i id="iprog"></i></div>
+    <div class="scroll"><div class="wrap">
+      <ol class="answered" id="answered"></ol>
+      <div id="qcur"></div>
+    </div></div>`, "intake");
+  ask(0);
+}
+function setStep(n, done){
+  const p = $("#iprog"); if (p) p.style.clipPath = `inset(0 ${100 - Math.round(((done ? n+1 : n) / 3) * 100)}% 0 0)`;
+}
+function renderQuestion(step, options){
+  const Q = QUESTIONS[step], box = $("#qcur"); if (!box) return;
+  box.innerHTML = `<div class="qcur enter">
+      <p class="qn">Question <b>${step+1}</b> of 3</p>
+      <h2 class="hx fit">${Q.q}</h2>
+      <p class="sub">${Q.sub}</p>
+      <ol class="opts" id="chips">${options.map((x,i) => `<li><button class="opt" type="button" data-i="${i}"><span class="n">${nn(i)}</span><span>${esc(x.t)}</span>${I.arrow}</button></li>`).join("")}</ol>
+      <form class="typed" id="f" autocomplete="off">
+        <div class="f"><label class="eyebrow" for="ta">Or type it</label><input id="ta" placeholder="${Q.ph}" aria-label="Your answer"></div>
+        <button class="go" id="send" type="submit" disabled>Continue ${I.arrow}</button>
+      </form>
+    </div>`;
+  fit(box);
+  const ta = $("#ta", box), send = $("#send", box);
+  ta.addEventListener("input", () => { send.disabled = !ta.value.trim(); });
+  $("#f", box).addEventListener("submit", e => {
+    e.preventDefault();
+    const v = ta.value.trim(); if (!v || S.busy) return;
+    ta.value = ""; send.disabled = true;
+    answer(v, null);
+  });
+  return box;
+}
+function onPick(list, pick){
+  $$("#chips .opt").forEach(b => b.addEventListener("click", () => { if (S.busy) return; pick(list[+b.dataset.i], b); }));
+}
+function scrollQ(){
+  const c = $(".intake .scroll"), q = $("#qcur"); if (!c || !q) return;
+  const prev = $("#answered li:last-child");
+  const qTop = q.getBoundingClientRect().top - c.getBoundingClientRect().top + c.scrollTop;
+  const top = Math.max(0, qTop - (prev ? prev.offsetHeight : 0) - 20);
+  c.scrollTo({top, behavior: RM ? "auto" : "smooth"});
+}
+/* Q1: the start screen's old example quotes now rotate through the answer field */
+function rotatePlaceholder(){
+  let i = 0;
+  const rot = () => {
+    const ta = $("#ta"); if (!ta || S.step !== 0 || ta === document.activeElement || ta.value) { if (ta && S.step === 0) later(rot, 3600); return; }
+    ta.classList.add("swap");
+    later(() => { i = (i+1) % EXAMPLES.length; ta.placeholder = `e.g. ${EXAMPLES[i]}`; ta.classList.remove("swap"); }, 320);
+    later(rot, 3600);
+  };
+  if (!RM) later(rot, 3600);
+}
+async function ask(step){
+  S.step = step; setStep(step);
+  if (step === 0){
+    renderQuestion(0, NEEDS);
+    onPick(NEEDS, (x, b) => { b.classList.add("sel"); answer(x.t, x); });
+    rotatePlaceholder();
+  } else if (step === 1){
+    const list = MARKETS.map(([t,v]) => ({t, v}));
+    renderQuestion(1, list);
+    onPick(list, (x, b) => {
+      if (!x.v){ $$("#chips .opt").forEach(o => o.classList.remove("sel")); const ta = $("#ta"); ta.placeholder = "Your city — e.g. Atlanta, Toronto, London"; ta.focus(); return; }
+      b.classList.add("sel"); answer(x.t, x);
+    });
+  } else {
+    const list = SIZES.map(t => ({t}));
+    renderQuestion(2, list);
+    onPick(list, (x, b) => { b.classList.add("sel"); answer(x.t, x); });
+  }
+  scrollQ();
+}
+function logAnswer(step, text, note){
+  const ol = $("#answered"); if (!ol) return;
+  const li = document.createElement("li");
+  li.innerHTML = `<span class="q">${QUESTIONS[step].short}</span><span class="a">${esc(text)}</span>${note?`<span class="k">${note}</span>`:""}`;
+  ol.appendChild(li);
+}
+async function answer(text, chip){
+  if (S.busy) return;
+  S.busy = true;
+  const c = $("#chips"); c && c.classList.add("dim");
+  setStep(S.step, true);
+  await wait(chip ? 360 : 80);
+  const cur = $("#qcur .qcur"); if (cur){ cur.classList.remove("enter"); cur.classList.add("leave"); }
+  await wait(230);
+  if (S.step === 0){
+    S.goal = text;
+    S.scn = chip ? chip.s : (detectScenario(text) || "hq");
+    S.unmatched = !chip && !detectScenario(text);
+    logAnswer(0, text, S.unmatched ? "We'll start broad and narrow it down with you." : SC[S.scn].ack);
+    S.busy = false; ask(1);
+  } else if (S.step === 1){
+    S.market = chip ? chip.v : detectMarket(text);
+    logAnswer(1, text, `We'll benchmark against ${esc(S.market)}.`);
+    S.busy = false; ask(2);
+  } else {
+    S.size = chip ? chip.t : detectSize(text);
+    logAnswer(2, text, "");
+    const box = $("#qcur"); if (box) box.innerHTML = `<p class="closing">That's everything. Putting your plan together.</p>`;
+    scrollQ();
+    later(thinking, 700);
+  }
+}
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+
+/* =========================================================
+   3. THINKING — one sweeping line, one status
+   ========================================================= */
+function thinking(){
+  const el = show(`
+    ${topbar({right:PROTO})}
+    <div class="body">
+      <p class="eyebrow">Your goal</p>
+      <p class="goal hx2 fit">${esc(S.goal)}</p>
+      <div class="sweep" aria-hidden="true"><i></i></div>
+      <p class="status" id="status" aria-live="polite"></p>
+      <button class="lnk skip" id="skip" type="button">Skip</button>
+    </div>`, "think");
+  const steps = ["Reading your goal", `Comparing ${S.market} with Palm Beach, Broward and Miami-Dade`, "Matching programmes and partners", "Choosing who you should meet", "Drafting your first 90 days"];
+  const st = $("#status", el);
+  let i = 0;
+  const tick = () => {
+    if (i >= steps.length){ later(plan, 380); return; }
+    const t = steps[i++];
+    st.classList.add("out");
+    later(() => { st.textContent = t; st.classList.remove("out"); }, 220);
+    later(tick, 760);
+  };
+  later(tick, 200);
+  $("#skip", el).addEventListener("click", () => plan());
+}
+
+/* =========================================================
+   4. PLAN
+   ========================================================= */
+function plan(){
+  const sc = SC[S.scn], m = S.market, F = FILMS[S.scn];
+  sc.people.forEach((p,i) => { if (S.people[i] === undefined) S.people[i] = true; });
+  const sec = (n, title, intro, body, cls="") => `<section class="sec ${cls}">
+      <header class="sec-h rv"><span class="idx">${n} / 07</span><h2 class="hx fit">${title}</h2>${intro?`<p>${intro}</p>`:""}</header>
+      <div class="sec-b">${body}</div>
+    </section>`;
+  const drow = (t, meta, more) => `<li><button class="dbtn" type="button" aria-expanded="false"><span class="dt">${t}</span><span class="dm">${meta}</span><span class="ic">${I.plus}</span></button><div class="dd"><div><p>${more}</p></div></div></li>`;
+  const el = show(`
+    ${topbar({right:`<div class="tlinks"><button class="tlink" id="save" type="button">Save</button><button class="tlink" id="restart" type="button">Start over</button></div>`})}
+    <div class="scroll"><div class="wrap">
+      <header class="phero">
+        <div>
+          <div class="erow rv"><span class="eyebrow">Your acceleration plan</span>${PROTO}</div>
+          <h1 class="hx fit rv" style="--d:80ms">${sc.headline}</h1>
+          <p class="lead rv" style="--d:160ms">${LEAD[S.scn](m)}</p>
+          <dl class="spec rv" style="--d:240ms">
+            <div><dt>Goal</dt><dd>${esc(S.goal)}</dd></div>
+            <div><dt>From</dt><dd>${esc(cap(m))}</dd></div>
+            <div><dt>Team</dt><dd>${esc(S.size)}</dd></div>
+            <div><dt>Best fit</dt><dd>${sc.focus}</dd></div>
+          </dl>
+        </div>
+        <button class="slot film rv" style="--d:200ms" id="poster" type="button" aria-label="Play LIVED IT · ${F.t} · ${F.len}">
+          <span class="fb" aria-hidden="true">${posterMap(sc)}</span>
+          ${still(S.scn)}
+          <video muted playsinline preload="metadata" aria-hidden="true" tabindex="-1"></video>
+          <span class="ftop"><span class="flab">AI generated · sample</span></span>
+          <span class="fbot">
+            <span class="play">${I.play}</span>
+            <span class="ftxt"><span class="ftt hx">Lived it</span><span class="fst">${F.t}<span class="dur" id="fdur">${F.len}</span></span></span>
+          </span>
+        </button>
+      </header>
+
+      <section class="where rv">
+        <div class="wh"><span class="eyebrow">Where we'd start</span></div>
+        <ol class="counties">${COUNTIES.map(c => { const on = sc.counties.includes(c.k); return `<li class="${on?"on":""}"><span class="mk"></span><span class="cn">${c.n}</span>${on?`<span class="rec">Recommended</span>`:"<span></span>"}<span class="ct">${c.c}</span></li>`; }).join("")}</ol>
+        <div class="mapwrap" id="mapwrap"><div>${mapSVG({focus:sc.counties, on:sc.nodes, primary:sc.primary, from:m})}</div></div>
+        <button class="tbtn mapbtn" id="mapbtn" type="button" aria-expanded="false" aria-controls="mapwrap"><span class="ic">${I.plus}</span><span class="t">Show map</span></button>
+      </section>
+
+      ${sec("01", "What works in your favour", "Ranked against what you told us. Figures in brackets are still being verified.",
+        `<ol class="rows">${sc.adv.map((a,i) => `<li class="rv" style="--d:${i*70}ms">
+            <div class="rh"><h3>${a.t}</h3><span class="match${a.s===3?" s3":""}">${a.s===3?"Strong match":"Good match"}</span></div>
+            <div><p>${a.d(m)}</p><p class="proof">${ph(a.p(m))}</p></div>
+          </li>`).join("")}</ol>`)}
+
+      ${sec("02", "Programmes", "Public programmes and resources that can lower the cost of getting here.",
+        `<ul class="dir rv">${sc.programs.map(p => drow(p.t, `<b>${p.g}</b> · ${p.o}`, ph(p.d))).join("")}</ul>`)}
+
+      ${sec("03", "Partners", "Institutions your deal team works with day to day.",
+        `<ul class="dir rv">${sc.partners.map(p => drow(p.n, p.r, `Your deal team can arrange a warm introduction to ${p.n}. [Contact — to confirm]`.replace(/\[([^\]]+)\]/g, '<span class="ph">[$1]</span>'))).join("")}</ul>`)}
+
+      ${sec("04", "People to meet", "Your deal team makes the introductions. Contacts shown are samples.",
+        `<ul class="people rv">${sc.people.map((p,i) => `<li class="person" data-i="${i}">
+            <div class="who"><div class="nm">${p.n} <span class="sample">Sample</span></div><div class="rl">${p.r}</div><div class="org">${p.o}</div></div>
+            <div class="why">${p.w}</div>
+            <button class="toggle" type="button" aria-pressed="${!!S.people[i]}"></button>
+          </li>`).join("")}</ul>`)}
+
+      ${sec("05", "Your first 90 days", "",
+        `<div class="phases tl rv">${sc.days.map(([h, items], i) => `<div class="phase"><div class="bar" style="--d:${i*300}ms"><i></i></div><span class="eyebrow">Days ${["0–30","31–60","61–90"][i]}</span><h4>${h}</h4><ul>${items.map(x => `<li>${typeof x === "function" ? x(m) : x}</li>`).join("")}</ul></div>`).join("")}</div>`)}
+
+      ${sec("06", "Success story", "",
+        `<div class="story rv">
+          <span class="eyebrow">Lived it · ${F.t} <span class="sample">Sample</span></span>
+          <h3>${sc.story.t(cap(m))}</h3>
+          <p class="co">${ph(sc.story.co)}</p>
+          <p class="d">${sc.story.d}</p>
+          <div class="stats">${sc.story.s.map(([b,s]) => `<div><b>${ph(b)}</b><span>${s}</span></div>`).join("")}</div>
+          <p class="act"><button class="tbtn" id="storylink" type="button"><span class="ic">${I.play}</span>Watch the film · ${F.len}</button></p>
+        </div>`)}
+
+      <div class="sig" aria-hidden="true"><i></i></div>
+      ${sec("07", "Ask us", "Anything about your plan. Your deal team answers before you meet.",
+        `<div class="ask rv">
+          <ol class="opts qs" id="qs">${sc.faq.map((f,i) => `<li><button class="opt" data-i="${i}" type="button"><span class="n">${nn(i)}</span><span>${f[0]}</span>${I.arrow}</button></li>`).join("")}</ol>
+          <div class="thread2" id="qa"></div>
+          <form class="typed" id="af" autocomplete="off">
+            <div class="f"><label class="eyebrow" for="ata">Your question</label><input id="ata" placeholder="Anything about your plan" aria-label="Ask a follow-up"></div>
+            <button class="go" type="submit">Ask ${I.arrow}</button>
+          </form>
+        </div>`, "ask")}
+      <p class="planfoot"><span>${BRAND.product} · ${BRAND.place}</span><span>Prototype · sample data</span></p>
+    </div></div>
+
+    <div class="ctabar" id="cta"><div class="in2">
+      <div class="q"><b class="dq">Want us to make these introductions?</b><span class="cl"><span class="cnt" id="ctasub"></span><span class="rest">your deal team handles the rest</span></span></div>
+      <button class="btn" id="intro" type="button">Make introductions ${I.arrow}</button>
+    </div></div>`, "plan");
+
+  reveal(el);
+  const scroller = $(".scroll", el);
+  const tlio = ("IntersectionObserver" in window) ? new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ $$(".bar", e.target).forEach(b => b.classList.add("in")); tlio.unobserve(e.target);} }), {root: scroller, threshold:.3}) : null;
+  tlio ? tlio.observe($(".tl", el)) : $$(".bar", el).forEach(b => b.classList.add("in"));
+  const cta = $("#cta", el);
+  later(() => cta.classList.add("in"), 1200);
+  /* collapse the CTA to just its button while scrolling down; restore on scroll up / at the end */
+  let lastY = 0;
+  scroller.addEventListener("scroll", () => {
+    const y = scroller.scrollTop, end = y + scroller.clientHeight >= scroller.scrollHeight - 40;
+    if (end || y < 120 || y < lastY - 6) cta.classList.remove("mini");
+    else if (y > lastY + 6) cta.classList.add("mini");
+    lastY = y;
+  }, {passive:true});
+
+  const refreshPeople = () => {
+    $$(".person", el).forEach(card => {
+      const i = +card.dataset.i, on = !!S.people[i];
+      card.classList.toggle("sel", on);
+      const t = $(".toggle", card);
+      t.setAttribute("aria-pressed", on);
+      t.innerHTML = on ? `<span class="box">${I.check}</span>Included` : `<span class="box">${I.plus.replace('viewBox="0 0 12 12"','viewBox="-3 -3 18 18"')}</span>Add`;
+    });
+    const n = Object.values(S.people).filter(Boolean).length;
+    $("#ctasub", el).textContent = n ? `${n} ${n>1?"people":"person"} selected` : "No one selected yet";
+  };
+  $$(".person .toggle", el).forEach(b => b.addEventListener("click", () => { const i = +b.closest(".person").dataset.i; S.people[i] = !S.people[i]; refreshPeople(); }));
+  refreshPeople();
+
+  $$(".dbtn", el).forEach(b => b.addEventListener("click", () => { const li = b.closest("li"), o = li.classList.toggle("open"); b.setAttribute("aria-expanded", o); }));
+
+  $("#restart", el).addEventListener("click", attract);
+  $("#save", el).addEventListener("click", () => toast("Plan saved. Your deal team can send you a copy."));
+  $("#storylink", el).addEventListener("click", () => openFilm(S.scn));
+  $("#poster", el).addEventListener("click", () => openFilm(S.scn));
+  probeFilm(S.scn, el);
+  const mw = $("#mapwrap", el), mb = $("#mapbtn", el);
+  mb.addEventListener("click", () => { const o = mw.classList.toggle("open"); mb.setAttribute("aria-expanded", o); $(".t", mb).textContent = o ? "Hide map" : "Show map"; if (o) later(() => mw.scrollIntoView({behavior: RM ? "auto" : "smooth", block:"nearest"}), 250); });
+  $("#intro", el).addEventListener("click", handoff);
+
+  const qa = $("#qa", el);
+  const addQA = async (q, a) => {
+    const d = document.createElement("div"); d.className = "qa";
+    d.innerHTML = `<div class="q">${esc(q)}</div><p>${ph(a)}</p>`;
+    qa.appendChild(d);
+    d.scrollIntoView({behavior: RM ? "auto" : "smooth", block:"center"});
+  };
+  $$("#qs .opt", el).forEach(b => b.addEventListener("click", () => {
+    if (b.classList.contains("sel")) return;
+    b.classList.add("sel");
+    const f = sc.faq[+b.dataset.i]; addQA(f[0], f[1](m));
+  }));
+  const ata = $("#ata", el);
+  $("#af", el).addEventListener("submit", e => {
+    e.preventDefault(); const v = ata.value.trim(); if (!v) return; ata.value = "";
+    addQA(v, `Good question. It's now on your plan, and your deal team will come back with specifics before your first conversation. [Answer — prepared by deal team]`);
+  });
+}
+
+/* =========================================================
+   5. HANDOFF + CONFIRMATION
+   ========================================================= */
+let sheet;
+function ensureSheet(){
+  if (sheet) return sheet;
+  sheet = document.createElement("div");
+  sheet.className = "sheet";
+  sheet.innerHTML = `<div class="scrim"></div><div class="panel" role="dialog" aria-modal="true" aria-label="Request introductions"><button class="x" type="button" aria-label="Close">${I.close}</button><div class="content"></div></div>`;
+  document.body.appendChild(sheet);
+  $(".scrim", sheet).addEventListener("click", () => closeSheet());
+  $(".x", sheet).addEventListener("click", () => closeSheet());
+  return sheet;
+}
+function closeSheet(instant){
+  if (!sheet) return;
+  sheet.classList.remove("on");
+}
+const HOW = ["Here at The Breakers","Video call","Visit the Gold Coast"];
+function handoff(){
+  const sc = SC[S.scn];
+  const chosen = sc.people.filter((p,i) => S.people[i]);
+  const list = chosen.length ? chosen : [sc.people[0]];
+  const s = ensureSheet();
+  $(".content", s).innerHTML = `
+    <div class="ho">
+      <div class="l">
+        <span class="eyebrow">Introductions</span>
+        <h2 class="hx fit">We'll set up the meetings.</h2>
+        <p>Your deal team arranges warm introductions and sends you the full plan.</p>
+        <ul class="intros">
+          ${list.map(p => `<li><b>${p.n} <span class="sample">Sample</span></b><span class="r2">${p.r} · ${p.o}</span></li>`).join("")}
+        </ul>
+        <p class="plus">Plus your acceleration plan and a ${ph(`[${S.market} vs. Gold Coast cost comparison]`)}, prepared by your deal team.</p>
+      </div>
+      <div class="r">
+        <form id="hf" novalidate autocomplete="off">
+          <div class="grid">
+            <div class="fld"><label for="hn">Full name</label><input id="hn" name="n" placeholder="First and last name"><span class="em"></span></div>
+            <div class="fld"><label for="hc">Company</label><input id="hc" name="c" placeholder="Company name"><span class="em"></span></div>
+            <div class="fld"><label for="ht">Title <i>(optional)</i></label><input id="ht" name="t" placeholder="e.g. Chief Operating Officer"><span class="em"></span></div>
+            <div class="fld"><label for="hp">Phone <i>(optional)</i></label><input id="hp" name="p" type="tel" inputmode="tel" placeholder="+1"><span class="em"></span></div>
+            <div class="fld full"><label for="he">Work email</label><input id="he" name="e" type="email" inputmode="email" placeholder="you@company.com"><span class="em"></span></div>
+          </div>
+          <div class="how">
+            <span class="eyebrow">How would you like to meet?</span>
+            <ol class="opts" id="how">${HOW.map((t,i) => `<li><button type="button" class="opt${t===S.how?" sel":""}" data-t="${t}"><span class="n">${nn(i)}</span><span>${t}</span>${I.check.replace('<svg ','<svg class="ar" ')}</button></li>`).join("")}</ol>
+          </div>
+          <p class="consent">By continuing you agree to be contacted by your Gold Coast deal team about this plan. <span class="sample">Prototype</span> Nothing you enter here is sent or stored.</p>
+          <button class="btn submit" type="submit">Make the introductions ${I.arrow}</button>
+        </form>
+      </div>
+    </div>`;
+  $$("#how .opt", s).forEach(b => b.addEventListener("click", () => { $$("#how .opt", s).forEach(x => x.classList.remove("sel")); b.classList.add("sel"); S.how = b.dataset.t; }));
+  $("#hf", s).addEventListener("submit", e => {
+    e.preventDefault();
+    const n = $("#hn", s), em = $("#he", s);
+    let ok = true;
+    const flag = (inp, msg) => { inp.classList.toggle("err", !!msg); inp.nextElementSibling.textContent = msg || ""; if (msg) ok = false; };
+    flag(n, n.value.trim() ? "" : "Please add your name");
+    flag(em, /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em.value.trim()) ? "" : "Please add a valid work email");
+    if (!ok) return;
+    confirmed({name: n.value.trim().split(" ")[0], email: em.value.trim(), company: $("#hc", s).value.trim(), list});
+  });
+  $(".panel", s).scrollTop = 0;
+  fit(s);
+  requestAnimationFrame(() => s.classList.add("on"));
+}
+function confirmed({name, email, company, list}){
+  const s = ensureSheet();
+  const ref = "GC27-" + Math.random().toString(36).slice(2,6).toUpperCase();
+  $(".content", s).innerHTML = `
+    <div class="done">
+      <div class="dl" aria-label="${BRAND.logoLabel}">${LOGO.s}</div>
+      <h2 class="hx fit rv2" style="--d:150ms">Thank you, ${esc(name)}.</h2>
+      <p class="hx2 sub2 rv2" style="--d:250ms">Your deal team will be in touch within 48 hours.</p>
+      <p class="p rv2" style="--d:350ms">We've shared your plan with ${list.length === 1 ? list[0].n : `${list.length} contacts`} and will send a copy to <b>${esc(email)}</b>.</p>
+      <ol class="next">
+        <li class="now rv2" style="--d:500ms"><span class="dot">${I.check}</span><span class="eyebrow">Today</span><b>Your plan is reviewed</b><span class="s">A relationship lead reads your goals and confirms the right introductions.</span></li>
+        <li class="rv2" style="--d:600ms"><span class="dot">2</span><span class="eyebrow">Within 48 hours</span><b>Introductions arranged</b><span class="s">${esc(S.how)}. We'll propose times that work for you.</span></li>
+        <li class="rv2" style="--d:700ms"><span class="dot">3</span><span class="eyebrow">Next 90 days</span><b>Your plan in motion</b><span class="s">Site visits, partner meetings and a 48-Hour Business Trip if it's right for you.</span></li>
+      </ol>
+      <div class="ref rv2" style="--d:800ms"><span>Reference <b>${ref}</b></span><span class="sample">Prototype</span><span>Nothing was sent or stored</span></div>
+      <div class="acts rv2" style="--d:880ms">
+        <button class="btn" id="new" type="button">Start a new plan ${I.arrow}</button>
+        <button class="lnk" id="back" type="button">Back to my plan</button>
+      </div>
+    </div>`;
+  $(".panel", s).scrollTop = 0;
+  fit(s);
+  $("#back", s).addEventListener("click", () => closeSheet());
+  $("#new", s).addEventListener("click", () => { closeSheet(); attract(); });
+}
+
+/* =========================================================
+   6. LIVED IT FILM — poster probe + full-screen player
+   ========================================================= */
+function probeFilm(k, root){
+  const p = $("#poster", root), v = p && $("video", p), d = $("#fdur", root);
+  if (!v) return;
+  v.addEventListener("loadeddata", () => p.classList.add("ready"), {once:true});
+  v.addEventListener("loadedmetadata", () => { if (isFinite(v.duration) && v.duration > 0) d.textContent = mmss(v.duration); }, {once:true});
+  v.addEventListener("error", () => { p.classList.add("missing"); d.textContent = "In production"; }, {once:true});
+  v.src = filmSrc(k) + "#t=4";   // poster frame: first light (S02)
+}
+let player;
+function ensurePlayer(){
+  if (player) return player;
+  player = document.createElement("div");
+  player.className = "player";
+  player.setAttribute("role", "dialog");
+  player.setAttribute("aria-modal", "true");
+  player.setAttribute("aria-label", "LIVED IT film");
+  player.innerHTML = `
+    <div class="pbar"><div class="t"><b>Lived it · <i id="pt"></i></b><span>${BRAND.series} · sample film</span></div><button class="px" type="button" aria-label="Close film">${I.close}</button></div>
+    <div class="pstage">
+      <video id="pv" playsinline controls preload="metadata"></video>
+      <div class="inprod" hidden>
+        <div class="w hx fit">Lived it</div><div class="s" id="ips"></div>
+        <span class="state">Film in production</span>
+        <p>A short film from a leader who made this move, in their own words. It will play here as soon as it's ready.</p>
+        <button class="lnk" type="button" id="ipcta">Talk to someone who lived it</button>
+        <small id="ipf"></small>
+      </div>
+    </div>
+    <div class="pfoot"><span class="ailabel g">AI generated · interview stand-ins &amp; scenes</span><span class="ailabel">Sample interviews · talent TBC</span><span class="pnote">Plays muted with subtitles · tap the speaker for sound</span></div>`;
+  document.body.appendChild(player);
+  $(".px", player).addEventListener("click", closeFilm);
+  $("#ipcta", player).addEventListener("click", () => { closeFilm(); handoff(); });
+  return player;
+}
+function openFilm(k){
+  const p = ensurePlayer(), v = $("#pv", p), ip = $(".inprod", p), f = FILMS[k] || FILMS.hq;
+  $("#pt", p).textContent = f.t; $("#ips", p).textContent = f.t;
+  ip.hidden = true; p.classList.remove("missing");
+  const vert = window.matchMedia("(max-width:767px) and (orientation:portrait)").matches;
+  const srcs = vert ? [filmSrc(k, true), filmSrc(k)] : [filmSrc(k)];
+  $("#ipf", p).textContent = `Expected file: ${srcs[srcs.length-1].replace(FILM_DIR, "films/")}`;
+  let i = 0;
+  const next = () => {
+    if (i >= srcs.length){ v.onerror = null; p.classList.add("missing"); ip.hidden = false; fit(p); return; }
+    v.src = srcs[i++]; v.muted = true;
+    const pr = v.play(); if (pr) pr.catch(() => {});
+  };
+  v.onerror = next;
+  next();
+  p.classList.add("on"); document.body.classList.add("noscroll");
+  fit(p);
+  later(() => $(".px", p).focus(), 60);
+}
+function closeFilm(){
+  if (!player || !player.classList.contains("on")) return;
+  const v = $("#pv", player);
+  v.onerror = null; v.pause(); v.removeAttribute("src"); v.load();
+  player.classList.remove("on"); document.body.classList.remove("noscroll");
+}
+
+/* =========================================================
+   KIOSK: Esc resets; idle 4 min returns to start
+   ========================================================= */
+document.addEventListener("keydown", e => { if (e.key === "Escape"){ if (player && player.classList.contains("on")) closeFilm(); else if (sheet && sheet.classList.contains("on")) closeSheet(); else attract(); } });
+let idle;
+const bump = () => { clearTimeout(idle); idle = setTimeout(() => { if (!$(".screen.attract.on")) attract(); }, 240000); };
+["pointerdown","keydown","scroll","touchstart"].forEach(ev => document.addEventListener(ev, bump, {passive:true, capture:true}));
+bump();
+
+/* deep link for demos / screenshots: #intake | #think | #plan=hq|life|talent|latam | #handoff | #done | #film */
+const hash = location.hash.slice(1);
+const mm = hash.match(/^(intake|think|plan|handoff|done|film)(?:=(\w+))?/);
+if (mm){
+  S.scn = SC[mm[2]] ? mm[2] : "hq";
+  S.goal = {hq:"Relocate our headquarters", life:"Find life-sciences lab space", talent:"Hire engineering talent", latam:"Set up an Americas / LatAm hub"}[S.scn];
+  S.market = {hq:"New York", life:"Boston", talent:"the Bay Area", latam:"Chicago"}[S.scn];
+  S.size = {hq:"50–250", life:"Under 50", talent:"250–1,000", latam:"50–250"}[S.scn];
+  if (mm[1] === "intake") intake();
+  else if (mm[1] === "think") thinking();
+  else if (mm[1] === "film"){ plan(); setTimeout(() => openFilm(S.scn), 300); }
+  else { plan(); if (mm[1] === "handoff" || mm[1] === "done") setTimeout(() => { handoff(); if (mm[1] === "done") confirmed({name:"Alex", email:"alex@company.com", list: SC[S.scn].people}); }, 300); }
+} else attract();
+})();
+
+</script>
+</body>
+</html>
