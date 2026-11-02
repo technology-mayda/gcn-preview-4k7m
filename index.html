@@ -613,6 +613,10 @@ body.noscroll{overflow:hidden}
   .sweep i{clip-path:none}
 }
 
+
+/* No widows: balance headings, pretty-wrap text (rule: never leave a single word on the last line) */
+h1,h2,h3,h4,.h1,.h2,.h3,[class*="title"],[class*="head"],.hl{text-wrap:balance}
+p,li,dd,figcaption,.lead,[class*="sub"],[class*="body"]{text-wrap:pretty}
 </style>
 </head>
 <body>
@@ -1577,6 +1581,22 @@ if (mm){
 } else attract();
 })();
 
+</script>
+
+<script>
+/* No-widows fallback: bind the last two words of headings and short text with a non-breaking space */
+(function(){
+  const SEL='h1,h2,h3,h4,p,li,figcaption,button,a,.lead,[class*="title"],[class*="head"]';
+  const fix=root=>root.querySelectorAll(SEL).forEach(el=>{
+    const w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT);let last=null,n;
+    while(n=w.nextNode()) if(n.nodeValue.trim()) last=n;
+    if(!last) return; const t=last.nodeValue, m=t.match(/^([\s\S]*\S)\s+(\S+\s*)$/);
+    if(m && m[2].trim().length<16 && t.trim().split(/\s+/).length>1) last.nodeValue=m[1]+'\u00a0'+m[2];
+  });
+  const run=()=>fix(document.body);
+  document.addEventListener('DOMContentLoaded',run);
+  new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(x=>x.nodeType===1&&fix(x.parentNode||x)))).observe(document.documentElement,{childList:true,subtree:true});
+})();
 </script>
 </body>
 </html>
